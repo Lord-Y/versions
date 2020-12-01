@@ -1,0 +1,270 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"regexp"
+	"strings"
+	"testing"
+
+	"github.com/Lord-Y/versions-api/cache"
+	"github.com/Lord-Y/versions-api/commons"
+	"github.com/Lord-Y/versions-api/mysql"
+	"github.com/Lord-Y/versions-api/postgres"
+	"github.com/alecthomas/assert"
+	"github.com/icrowley/fake"
+	"github.com/rs/zerolog/log"
+)
+
+func performRequest(r http.Handler, headers map[string]string, method string, url string, payload string) (z *httptest.ResponseRecorder, err error) {
+	var (
+		req *http.Request
+	)
+
+	switch method {
+	case "GET":
+		req, err = http.NewRequest(method, url, nil)
+	case "POST":
+		req, err = http.NewRequest(method, url, strings.NewReader(payload))
+	default:
+		if payload == "" {
+			req, err = http.NewRequest(method, url, nil)
+		} else {
+			req, err = http.NewRequest(method, url, strings.NewReader(payload))
+		}
+	}
+	if err != nil {
+		log.Error().Err(err).Msgf("Error occured while initalising http request")
+		return nil, err
+	}
+	if len(headers) > 0 {
+		for k, v := range headers {
+			req.Header.Set(k, v)
+		}
+	}
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	return w, nil
+}
+
+func TestPing(t *testing.T) {
+	if commons.SqlDriver == "mysql" {
+		if !mysql.Ping() {
+			log.Error().Msg("Fail to ping database instance")
+			t.Fail()
+		}
+	} else {
+		if !postgres.Ping() {
+			log.Error().Msg("Fail to ping database instance")
+			t.Fail()
+		}
+	}
+}
+
+func TestHealth(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/health", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Contains(w.Body.String(), "OK", "Fail to get /health body")
+	assert.Equal(200, w.Code, "Fail to get /health")
+}
+
+func TestHealthz(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/healthz", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Contains(w.Body.String(), "status", "Fail to get /healthz body")
+	assert.Equal(200, w.Code, "Fail to get /healthz")
+}
+
+func createFakeVerion() (s string) {
+	return fmt.Sprintf("%d.%d.%d", commons.RandomInt(1, 5), commons.RandomInt(1, 25), commons.RandomInt(1, 20))
+}
+func TestCreate(t *testing.T) {
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	payload := fmt.Sprintf("workload=%s", fake.CharactersN(3))
+	for i := 0; i < 3; i++ {
+		if i%2 == 0 {
+			fmt.Printf("modulo 2\n")
+			fmt.Printf("payload before %s\n", payload)
+			payload += fmt.Sprintf("&platform=%s", fake.CharactersN(10))
+			payload += fmt.Sprintf("&environment=%s", fake.CharactersN(10))
+		} else {
+			fmt.Printf("no modulo 2\n")
+			fmt.Printf("no modulo payload before %s\n", payload)
+			payload = fmt.Sprintf("workload=%s", fake.CharactersN(3))
+			payload += fmt.Sprintf("&platform=%s", fake.CharactersN(10))
+			payload += fmt.Sprintf("&environment=%s", fake.CharactersN(10))
+		}
+		payload += fmt.Sprintf("&version=%s", createFakeVerion())
+		payload += fmt.Sprintf("&changelogURL=http://www.%s/changelog", strings.ToLower(fake.DomainName()))
+		payload += fmt.Sprintf("&raw=%s", "{'a': 'b'}")
+
+		w, err := performRequest(router, headers, "POST", "/api/v1/versions/create", payload)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing http request")
+			t.Fail()
+			return
+		}
+
+		assert.Contains(w.Body.String(), "OK", fmt.Sprintf("Fail to create new version during test number %d with payload %s", i, payload))
+		assert.Equal(201, w.Code, fmt.Sprintf("Fail to get right http status code during test number %d", i))
+		r := regexp.MustCompile(`&version=.*\..*\..*&`)
+		payload = r.ReplaceAllString(payload, "&")
+	}
+	if commons.RedisEnabled() {
+		cache.RedisFlushDB(commons.GetRedisURI())
+	}
+}
+
+func TestReadEnvironment_200(t *testing.T) {
+	headers := make(map[string]string)
+	result := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	if commons.SqlDriver == "mysql" {
+		result = mysql.ReadForUnitTesting()
+	} else {
+		result = postgres.ReadForUnitTesting()
+	}
+	if len(result) > 0 && result["workload"] != "NULL" && result["platform"] != "NULL" {
+		url := fmt.Sprintf("/api/v1/versions/read/environment?workload=%s&platform=%s&environment=%s", result["workload"], result["platform"], result["environment"])
+		w, err := performRequest(router, headers, "GET", url, "")
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing http request")
+			t.Fail()
+			return
+		}
+		assert.Equal(200, w.Code, "Fail to get expected status code")
+		assert.Contains(w.Body.String(), "workload", "Fail to get expected content")
+
+	} else {
+		log.Error().Msg("Error occured while getting data for unit testing from DB")
+		t.Fail()
+	}
+}
+
+func TestReadEnvironment_400(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/environment?workload=plop", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Equal(400, w.Code, "Fail to get expected status code")
+}
+
+func TestReadEnvironment_404(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/environment?workload=plop&platform=platform&environment=environment", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Equal(404, w.Code, "Fail to get expected status code")
+}
+
+func TestReadPlatform_200(t *testing.T) {
+	headers := make(map[string]string)
+	result := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	if commons.SqlDriver == "mysql" {
+		result = mysql.ReadForUnitTesting()
+	} else {
+		result = postgres.ReadForUnitTesting()
+	}
+	if len(result) > 0 && result["workload"] != "NULL" && result["platform"] != "NULL" {
+		url := fmt.Sprintf("/api/v1/versions/read/platform?workload=%s&platform=%s", result["workload"], result["platform"])
+		w, err := performRequest(router, headers, "GET", url, "")
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing http request")
+			t.Fail()
+			return
+		}
+		assert.Equal(200, w.Code, "Fail to get expected status code")
+		assert.Contains(w.Body.String(), "workload", "Fail to get expected content")
+
+	} else {
+		log.Error().Msg("Error occured while getting data for unit testing from DB")
+		t.Fail()
+	}
+}
+
+func TestReadPlatform_400(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/platform?workload=plop", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Equal(400, w.Code, "Fail to get expected status code")
+}
+
+func TestReadPlatform_404(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/platform?workload=plop&platform=platform", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Equal(404, w.Code, "Fail to get expected status code")
+}
+
+func TestReadDistinctWorkloads(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/distinct/workloads", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+	assert.Equal(200, w.Code, "Fail to get expected status code")
+	assert.Contains(w.Body.String(), "workload", "Fail to get expected content")
+}
