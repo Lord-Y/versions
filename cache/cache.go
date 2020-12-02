@@ -174,7 +174,7 @@ func RedisPing(redisURI string) (b bool) {
 	rdb := redis.NewClient(opt)
 	err = rdb.Ping(ctx).Err()
 	if err != nil {
-		log.Error().Err(err).Msgf("Error occured while pinging redis %s address %s", opt.Addr)
+		log.Error().Err(err).Msgf("Error occured while pinging redis %s address", opt.Addr)
 		return
 	}
 	return true
