@@ -17,6 +17,7 @@
               <th class="px-2 py-2">Version</th>
               <th class="px-2 py-2">Changelog</th>
               <th class="px-2 py-2">Raw</th>
+              <th class="px-2 py-2">Status</th>
               <th class="px-2 py-2">Date</th>
             </tr>
           </thead>
@@ -45,9 +46,9 @@
                 <a
                   class="hover:text-blue-600"
                   :href="deployment.changelog_url"
-                  title="See changelog"
+                  title="Click here to see changelog"
                 >
-                  {{ deployment.version }}
+                  Click here to see changelog
                 </a>
               </td>
               <td
@@ -69,11 +70,12 @@
                     '/raw/' +
                     deployment.version
                   "
-                  title="See version content"
+                  title="Click here to see details"
                 >
-                  {{ deployment.version }}
+                  click here to see details
                 </a>
               </td>
+              <td class="px-2 pt-1 pb-4">{{ deployment.status }}</td>
               <td class="px-2 pt-1 pb-4">{{ deployment.date }}</td>
             </tr>
           </tbody>
@@ -82,15 +84,17 @@
       <Pagination v-if="pagination.enabled" :pagination="pagination.data" />
     </template>
     <template v-if="responseStatus === 204">
-      <h2 class="text-center text-gray-400">
+      <h2 class="text-center text-gray-400 text-xl font-semibold">
         So far no deployment has been registered
       </h2>
     </template>
     <template v-if="responseStatus === 404">
-      <h2 class="text-center text-gray-400">This environment does not exist</h2>
+      <h2 class="text-center text-gray-400 text-xl font-semibold">
+        This environment does not exist
+      </h2>
     </template>
     <template v-if="responseStatus === 500">
-      <h2 class="text-center text-red-800">
+      <h2 class="text-center text-red-800 text-xl font-semibold">
         An error occured while retrieving last deployments. Please try later.
       </h2>
     </template>
