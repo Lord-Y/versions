@@ -61,8 +61,8 @@ jobs:
 
      # build docker image
     - run:
-      name: Try to build docker image
-      command: docker build -t versions-api:latest .
+        name: Try to build docker image
+        command: docker build -t versions-api:latest .
 
 workflows:
   version: 2
