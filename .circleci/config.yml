@@ -103,26 +103,70 @@ jobs:
         name: Perform unit testing
         command: go test -v
 
-  build-latest:
+  build-latest-and-deploy:
     working_directory: /app
     docker:
     - image: docker:stable-dind
+      environment:
+        KIND_VERSION: 0.9.0
+        KIND_VERSION_NODE: 1.19.4
+        HELM_VERSION: 3.4.1
+        IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
 
     steps:
     # pull sources
     - checkout
     - setup_remote_docker
 
+    - restore_cache:
+        keys:
+        - versions-api-build-latest-and-deploy-{{ checksum "go.mod" }}
+
+    - run:
+        name: Install kind, kubectl, and helm
+        command: |
+          curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+          curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          
+          curl --fail --retry 3 -Lo helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          chmod +x linux-amd64/helm
+          sudo mv linux-amd64/helm /usr/local/bin
+
+    - run:
+        name: Create kind clusters
+        command: |
+          kind create cluster --name dc1 --image kindest/node:v${KIND_VERSION_NODE} --wait 5m
+
+    - run:
+        name: Get kind clusters
+        command: |
+          kind get clusters
+
+    - save_cache:
+        key: versions-api-build-latest-and-deploy-{{ checksum "go.mod" }}
+        paths:
+        - /go/pkg/mod
+
     - run:
         name: Try to build docker image
         command: |
-          IMAGE_NAME=docker.pkg.github.com/lord-y/versions-api
           docker build -t ${IMAGE_NAME}:latest .
 
-  build-tags:
+  build-tags-and-deploy:
     working_directory: /app
     docker:
     - image: docker:stable-dind
+      environment:
+        KIND_VERSION: 0.9.0
+        KIND_VERSION_NODE: 1.19.4
+        HELM_VERSION: 3.4.1
+        IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
 
     steps:
     # pull sources
@@ -133,7 +177,6 @@ jobs:
         name: Build docker image
         command: |
           echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
-          IMAGE_NAME=docker.pkg.github.com/lord-y/versions-api
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
 
@@ -143,14 +186,14 @@ workflows:
     jobs:
     - mariadb
     - postgres
-    - build-latest:
+    - build-latest-and-deploy:
         requires:
         - mariadb
         - postgres
         filters:
           branches:
             ignore: master
-    - build-tags:
+    - build-tags-and-deploy:
         requires:
         - mariadb
         - postgres
