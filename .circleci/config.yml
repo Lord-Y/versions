@@ -118,6 +118,8 @@ jobs:
         command: |
           IMAGE_NAME=docker.pkg.github.com/lord-y/versions-api
           docker build -t ${IMAGE_NAME}:latest .
+        - persist_to_workspace:
+          root: /root/project/latest
 
   build-tags:
     working_directory: /app
@@ -136,6 +138,8 @@ jobs:
           IMAGE_NAME=docker.pkg.github.com/lord-y/versions-api
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+        - persist_to_workspace:
+          root: /root/project/tag
 
 workflows:
   version: 2
