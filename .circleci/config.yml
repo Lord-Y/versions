@@ -10,7 +10,7 @@ jobs:
         MYSQL_USER: versions
         MYSQL_PASSWORD: versions
         MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-    - image: circlci/golang:1.15
+    - image: circleci/golang:1.15
       environment:
         SQL_DRIVER: mysql
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true
@@ -34,7 +34,7 @@ jobs:
         POSTGRES_DB: versions
         POSTGRES_USER: versions
         POSTGRES_PASSWORD: versions
-    - image: circlci/golang:1.15
+    - image: circleci/golang:1.15
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
