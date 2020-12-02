@@ -8,7 +8,7 @@ jobs:
       environment:
         SQL_DRIVER: mysql
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true
-        REDIS_ENABLED: true
+        REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
     - image: mariadb:10.5
       environment:
@@ -59,7 +59,7 @@ jobs:
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
-        REDIS_ENABLED: true
+        REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
     - image: postgres:13.1
       environment:
@@ -116,8 +116,8 @@ jobs:
     - run:
         name: Try to build docker image
         command: |
-        IMAGE_NAME=docker.pkg.github.com/Lord-Y/versions-api
-        docker build -t ${IMAGE_NAME}:latest .
+          IMAGE_NAME=docker.pkg.github.com/Lord-Y/versions-api
+          docker build -t ${IMAGE_NAME}:latest .
 
   build-tags:
     working_directory: /app
@@ -132,10 +132,10 @@ jobs:
     - run:
         name: Build docker image
         command: |
-        echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
-        IMAGE_NAME=docker.pkg.github.com/Lord-Y/versions-api
-        docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
-        docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+          echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
+          IMAGE_NAME=docker.pkg.github.com/Lord-Y/versions-api
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
 
 workflows:
   version: 2
