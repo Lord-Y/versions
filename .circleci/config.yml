@@ -19,9 +19,22 @@ jobs:
     # pull sources
     - checkout
 
+    - restore_cache:
+        keys:
+          - versions-api-mariadb-{{ checksum "go.mod" }}
+    
+    - run:
+        name: go mod download
+        command: go mod download
+
     - run:
         name: Wait for DB to be ready
         command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
+    
+     - save_cache:
+        key: versions-api-mariadb-{{ checksum "go.mod" }}
+        paths:
+        - "/go/pkg/mod"
 
     - run:
         name: Perform unit testing
@@ -43,21 +56,36 @@ jobs:
     # pull sources
     - checkout
 
+    - restore_cache:
+        keys:
+          - versions-api-postgres-{{ checksum "go.mod" }}
+    
+    - run:
+        name: go mod download
+        command: go mod download
+
     - run:
         name: Wait for DB to be ready
         command: dockerize -wait tcp://127.0.0.1:5432 -timeout 1m
+    
+     - save_cache:
+        key: versions-api-postgres-{{ checksum "go.mod" }}
+        paths:
+        - "/go/pkg/mod"
 
     - run:
         name: Perform unit testing
         command: go test -v
 
   build-image:
+    working_directory: /app
     docker:
-    - image: golang:1.15-alpine
+    - image: docker:stable-dind
 
     steps:
     # pull sources
     - checkout
+    - setup_remote_docker
 
     - run:
         name: Try to build docker image
