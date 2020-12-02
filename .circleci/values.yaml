@@ -1,0 +1,57 @@
+nameOverride: "versions-api"
+
+container:
+  port: &cport 8080
+
+image:
+  repository: docker.pkg.github.com/lord-y/versions-api
+  tag: latest
+
+initialDelaySeconds: &initialDelaySeconds 60
+livenessProbe:
+  custom:
+    failureThreshold: 3
+    httpGet:
+      path: /api/v1/versions/health
+      port: http
+      scheme: HTTP
+    initialDelaySeconds: *initialDelaySeconds
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 10
+
+readinessProbe:
+  custom:
+    failureThreshold: 3
+    httpGet:
+      path: /api/v1/versions/health
+      port: http
+      scheme: HTTP
+    initialDelaySeconds: *initialDelaySeconds
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 10
+
+env:
+  SLEEP: 50
+  APP_PORT: *cport
+  APP_PROMETHEUS: "true"
+  SQL_DRIVER: mysql
+  DB_URI: "versions:versions@tcp(versions-api-mariadb:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true"
+
+metrics:
+  serviceMonitor:
+    interval: 15s
+    app:
+      enabled: true
+
+mariadb:
+  enabled: true
+  architecture: standalone
+  auth:
+    rootPassword: rootPassword
+    database: versions
+    username: versions
+    password: versions
+  secondary:
+    replicaCount: 0
