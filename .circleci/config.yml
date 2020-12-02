@@ -28,11 +28,11 @@ jobs:
         command: go test -v
 
   postgres:
+    docker:
     - image: circleci/golang:1.15
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
-    docker:
     - image: postgres:13.1
       environment:
         POSTGRES_DB: versions
