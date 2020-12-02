@@ -9,7 +9,7 @@ jobs:
         MYSQL_DATABASE: versions
         MYSQL_USER: versions
         MYSQL_PASSWORD: versions
-        MYSQL_ALLOW_EMPTY_PASSWORD: true
+        MYSQL_ALLOW_EMPTY_PASSWORD: "true"
     - image: golang:1.15-alpine
       environment:
         SQL_DRIVER: mysql
@@ -70,6 +70,6 @@ workflows:
     - mariadb
     - postgres
     - build-image:
-      requires:
-      - mariadb
-      - postgres
+        requires:
+        - mariadb
+        - postgres
