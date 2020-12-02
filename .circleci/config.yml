@@ -123,8 +123,10 @@ jobs:
         - versions-api-build-latest-and-deploy-{{ checksum "go.mod" }}
 
     - run:
-        name: Install kind, kubectl, and helm
+        name: Install curl, kind, kubectl, and helm
         command: |
+          apk update && apk add --no-cache curl ca-certificates
+          
           curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
           chmod +x ./kind
           sudo mv ./kind /usr/local/bin/kind
