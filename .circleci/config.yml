@@ -168,7 +168,7 @@ jobs:
     - run:
         name: Deploy latest build
         command: |
-          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace versions -f .circleci/values.yaml --wait
+          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace versions -f .circleci/values.yaml --wait --kube-context kind-dc1
 
   build-tags-and-deploy:
     working_directory: /app
