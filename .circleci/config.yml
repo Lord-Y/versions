@@ -8,12 +8,17 @@ jobs:
       environment:
         SQL_DRIVER: mysql
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true
+        REDIS_ENABLED: true
+        REDIS_URI: redis://:password@host:port
     - image: mariadb:10.5
       environment:
         MYSQL_DATABASE: versions
         MYSQL_USER: versions
         MYSQL_PASSWORD: versions
         MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+    - image: bitnami/redis:6.0
+      environment:
+        REDIS_PASSWORD: password
 
     steps:
     # pull sources
@@ -31,6 +36,10 @@ jobs:
         name: Wait for DB to be ready
         command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
     
+    - run:
+        name: Wait for REDIS to be ready
+        command: dockerize -wait tcp://127.0.0.1:6379 -timeout 1m
+    
     - save_cache:
         key: versions-api-mariadb-{{ checksum "go.mod" }}
         paths:
@@ -46,11 +55,16 @@ jobs:
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
+        REDIS_ENABLED: true
+        REDIS_URI: redis://:password@host:port
     - image: postgres:13.1
       environment:
         POSTGRES_DB: versions
         POSTGRES_USER: versions
         POSTGRES_PASSWORD: versions
+    - image: bitnami/redis:6.0
+      environment:
+        REDIS_PASSWORD: password
 
     steps:
     # pull sources
@@ -67,6 +81,10 @@ jobs:
     - run:
         name: Wait for DB to be ready
         command: dockerize -wait tcp://127.0.0.1:5432 -timeout 1m
+
+    - run:
+        name: Wait for REDIS to be ready
+        command: dockerize -wait tcp://127.0.0.1:6379 -timeout 1m
     
     - save_cache:
         key: versions-api-postgres-{{ checksum "go.mod" }}

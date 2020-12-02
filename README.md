@@ -21,10 +21,10 @@ export SQL_DRIVER=postgres
 export DB_URI must be like so: `postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable`
 # If you want to enable a redis
 export REDIS_ENABLED=true
-export REDIS_URI=redis://xxxxx@host:port/db
+export REDIS_URI=redis://:xxxxx@host:port/db
 # or 
 export REDIS_ENABLED=true
-export REDIS_URI=redis://xxxxx@host:port
+export REDIS_URI=redis://:xxxxx@host:port
 ```
 
 SQL_DRIVER can only be `mysql` or `postgres`
