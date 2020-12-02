@@ -125,7 +125,7 @@ jobs:
     - run:
         name: Install curl, kind, kubectl, and helm
         command: |
-          apk update && apk add --no-cache curl ca-certificates
+          apk update && apk add --no-cache curl git ca-certificates
           
           curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
           chmod +x ./kind
@@ -156,9 +156,19 @@ jobs:
         - /go/pkg/mod
 
     - run:
-        name: Try to build docker image
+        name: Clone helm charts
+        command: |
+          git clone git@github.com:Lord-Y/helm.git helm-charts
+
+    - run:
+        name: Build latest docker image
         command: |
           docker build -t ${IMAGE_NAME}:latest .
+
+    - run:
+        name: Deploy latest build
+        command: |
+          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace versions -f .circleci/values.yaml --wait
 
   build-tags-and-deploy:
     working_directory: /app
@@ -176,7 +186,7 @@ jobs:
     - setup_remote_docker
 
     - run:
-        name: Build docker image
+        name: Build tag docker image
         command: |
           echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
