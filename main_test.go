@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -100,26 +101,30 @@ func createFakeVerion() (s string) {
 func TestCreate(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
+	type result struct {
+		VersionId int64
+	}
+	statusList := []string{
+		"deployed",
+		"failed",
+	}
 
 	assert := assert.New(t)
 	router := SetupRouter()
 	payload := fmt.Sprintf("workload=%s", fake.CharactersN(3))
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 10; i++ {
 		if i%2 == 0 {
-			fmt.Printf("modulo 2\n")
-			fmt.Printf("payload before %s\n", payload)
 			payload += fmt.Sprintf("&platform=%s", fake.CharactersN(10))
 			payload += fmt.Sprintf("&environment=%s", fake.CharactersN(10))
 		} else {
-			fmt.Printf("no modulo 2\n")
-			fmt.Printf("no modulo payload before %s\n", payload)
 			payload = fmt.Sprintf("workload=%s", fake.CharactersN(3))
 			payload += fmt.Sprintf("&platform=%s", fake.CharactersN(10))
 			payload += fmt.Sprintf("&environment=%s", fake.CharactersN(10))
 		}
 		payload += fmt.Sprintf("&version=%s", createFakeVerion())
 		payload += fmt.Sprintf("&changelogURL=http://www.%s/changelog", strings.ToLower(fake.DomainName()))
-		payload += fmt.Sprintf("&raw=%s", "{'a': 'b'}")
+		payload += "&raw={'a': 'b'}"
+		payload += "&status=ongoing"
 
 		w, err := performRequest(router, headers, "POST", "/api/v1/versions/create", payload)
 		if err != nil {
@@ -128,10 +133,30 @@ func TestCreate(t *testing.T) {
 			return
 		}
 
-		assert.Contains(w.Body.String(), "OK", fmt.Sprintf("Fail to create new version during test number %d with payload %s", i, payload))
+		assert.Contains(w.Body.String(), "versionId", fmt.Sprintf("Fail to create new version during test number %d with payload %s", i, payload))
 		assert.Equal(201, w.Code, fmt.Sprintf("Fail to get right http status code during test number %d", i))
 		r := regexp.MustCompile(`&version=.*\..*\..*&`)
 		payload = r.ReplaceAllString(payload, "&")
+
+		log.Info().Msg("Let's update status")
+		if w.Code == 201 {
+			r := result{}
+			err = json.Unmarshal([]byte(w.Body.String()), &r)
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while unmarshalling data")
+				t.Fail()
+				return
+			}
+			payloadStatus := fmt.Sprintf("versionId=%d&status=%s", r.VersionId, commons.RandomValueFromArray(statusList))
+
+			wu, err := performRequest(router, headers, "POST", "/api/v1/versions/update/status", payloadStatus)
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while performing http request")
+				t.Fail()
+				return
+			}
+			assert.Equal(200, wu.Code, fmt.Sprintf("Fail to update deployment versionId %d during test number %d", r.VersionId, i))
+		}
 	}
 	if commons.RedisEnabled() {
 		cache.RedisFlushDB(commons.GetRedisURI())

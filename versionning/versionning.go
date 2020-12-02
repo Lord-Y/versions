@@ -22,7 +22,39 @@ var (
 // Create stand to insert new deployment in DB
 func Create(c *gin.Context) {
 	var (
-		d   models.Create
+		d      models.Create
+		err    error
+		result int64
+	)
+	if err = c.ShouldBind(&d); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if commons.SqlDriver == "mysql" {
+		result, err = mysql.Create(d)
+	} else {
+		result, err = postgres.Create(d)
+	}
+	log.Info().Msgf("result %v", result)
+
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	} else {
+		if commons.RedisEnabled() {
+			cache.RedisDeleteKeysHasPrefix(commons.GetRedisURI(), []string{
+				"w_p_",
+			})
+		}
+		c.JSON(http.StatusCreated, gin.H{"versionId": result})
+	}
+}
+
+// UpdateStatus stand to update status of deployment in DB
+func UpdateStatus(c *gin.Context) {
+	var (
+		d   models.UpdateStatus
 		err error
 	)
 	if err = c.ShouldBind(&d); err != nil {
@@ -31,9 +63,9 @@ func Create(c *gin.Context) {
 	}
 
 	if commons.SqlDriver == "mysql" {
-		err = mysql.Create(d)
+		err = mysql.UpdateStatus(d)
 	} else {
-		err = postgres.Create(d)
+		err = postgres.UpdateStatus(d)
 	}
 
 	if err != nil {
@@ -45,7 +77,7 @@ func Create(c *gin.Context) {
 				"w_p_",
 			})
 		}
-		c.JSON(http.StatusCreated, "OK")
+		c.JSON(http.StatusOK, "OK")
 	}
 }
 

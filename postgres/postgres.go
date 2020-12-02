@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Lord-Y/versions-api/commons"
 	"github.com/Lord-Y/versions-api/models"
@@ -75,8 +76,8 @@ func Ping() (b bool) {
 	return true
 }
 
-// Create stand to insert data into MySQL instance
-func Create(d models.Create) (err error) {
+// Create stand to insert data into sql instance
+func Create(d models.Create) (z int64, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
 		commons.BuildDSN(),
@@ -87,17 +88,45 @@ func Create(d models.Create) (err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO versions(workload, platform, environment, version, changelog_url, raw) VALUES($1,$2,$3,$4,$5,$6)")
+	stmt, err := db.Prepare("INSERT INTO versions(workload, platform, environment, version, changelog_url, raw, status) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING versions_id")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
-	_, err = stmt.Exec(
+	err = stmt.QueryRow(
 		php2go.Addslashes(d.Workload),
 		php2go.Addslashes(d.Platform),
 		php2go.Addslashes(d.Environment),
 		php2go.Addslashes(d.Version),
 		php2go.Addslashes(d.ChangelogURL),
 		php2go.Addslashes(d.Raw),
+		php2go.Addslashes(strings.ToLower(d.Status)),
+	).Scan(&z)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	defer stmt.Close()
+	return z, nil
+}
+
+// UpdateStatus stand to insert data into sql instance
+func UpdateStatus(d models.UpdateStatus) (err error) {
+	db, err := sql.Open(
+		commons.SqlDriver,
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE versions SET status = $1 WHERE versions_id = $2")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	_, err = stmt.Exec(
+		php2go.Addslashes(strings.ToLower(d.Status)),
+		d.VersionId,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return err

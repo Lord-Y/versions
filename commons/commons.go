@@ -77,3 +77,13 @@ func GetMD5HashWithSum(text string) string {
 	hash := md5.Sum([]byte(text))
 	return hex.EncodeToString(hash[:])
 }
+
+// RandomValueFromArray function is explicit
+func RandomValueFromArray(array []string) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	n := make([]string, len(array))
+	for i, v := range r.Perm(len(array)) {
+		n[i] = array[v]
+	}
+	return n[0]
+}

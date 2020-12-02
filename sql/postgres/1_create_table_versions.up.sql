@@ -1,11 +1,12 @@
 CREATE TABLE versions (
   versions_id SERIAL PRIMARY KEY,
-  workload varchar(100) DEFAULT NULL,
-  platform varchar(100) DEFAULT NULL,
-  environment varchar(100) DEFAULT NULL,
-  version varchar(100) DEFAULT NULL,
+  workload varchar(100) NOT NULL,
+  platform varchar(100) NOT NULL,
+  environment varchar(100) NOT NULL,
+  version varchar(100) NOT NULL,
   changelog_url text DEFAULT NULL,
   raw text DEFAULT NULL,
+  status text NOT NULL,
   date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -73,6 +73,7 @@ func SetupRouter() *gin.Engine {
 		v1.HEAD("/healthz", health.Healthz)
 
 		v1.POST("/create", versionning.Create)
+		v1.POST("/update/status", versionning.UpdateStatus)
 		v1.GET("/read/environment", versionning.ReadEnvironment)
 		v1.GET("/read/platform", versionning.ReadPlatform)
 		v1.GET("/read/home", versionning.ReadHome)

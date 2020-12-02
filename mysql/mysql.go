@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Lord-Y/versions-api/commons"
 	"github.com/Lord-Y/versions-api/models"
@@ -57,9 +58,12 @@ func InitDB() {
 	log.Info().Msg("Database migrated successfully")
 }
 
-// Ping stand to ping MySQL instance
+// Ping stand to ping sql instance
 func Ping() (b bool) {
-	db, err := sql.Open("mysql", commons.BuildDSN())
+	db, err := sql.Open(
+		commons.SqlDriver,
+		commons.BuildDSN(),
+	)
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while connecting to DB")
 		return
@@ -73,26 +77,61 @@ func Ping() (b bool) {
 	return true
 }
 
-// Create stand to insert data into MySQL instance
-func Create(d models.Create) (err error) {
-	db, err := sql.Open("mysql", commons.BuildDSN())
+// Create stand to insert data into sql instance
+func Create(d models.Create) (z int64, err error) {
+	db, err := sql.Open(
+		commons.SqlDriver,
+		commons.BuildDSN(),
+	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to connect to DB")
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO versions(`workload`, `platform`, `environment`, `version`, `changelog_url`, `raw`) VALUES(?,?,?,?,?,?)")
+	stmt, err := db.Prepare("INSERT INTO versions(`workload`, `platform`, `environment`, `version`, `changelog_url`, `raw`, `status`) VALUES(?,?,?,?,?,?,?)")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
-	_, err = stmt.Exec(
+	res, err := stmt.Exec(
 		php2go.Addslashes(d.Workload),
 		php2go.Addslashes(d.Platform),
 		php2go.Addslashes(d.Environment),
 		php2go.Addslashes(d.Version),
 		php2go.Addslashes(d.ChangelogURL),
 		php2go.Addslashes(d.Raw),
+		php2go.Addslashes(strings.ToLower(d.Status)),
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	lastInsertId, err := res.LastInsertId()
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+	return lastInsertId, nil
+}
+
+// UpdateStatus stand to insert data into sql instance
+func UpdateStatus(d models.UpdateStatus) (err error) {
+	db, err := sql.Open(
+		commons.SqlDriver,
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to connect to DB")
+		return
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE versions SET status = ? WHERE versions_id = ?")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	_, err = stmt.Exec(
+		php2go.Addslashes(strings.ToLower(d.Status)),
+		d.VersionId,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return
