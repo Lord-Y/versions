@@ -1,0 +1,7 @@
+{
+    "eslint.enable": false,
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.minimap.enabled": false
+}
