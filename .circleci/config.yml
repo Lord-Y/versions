@@ -147,9 +147,9 @@ workflows:
         requires:
         - mariadb
         - postgres
-      filters:
-        branches:
-          ignore: master
+        filters:
+          branches:
+            ignore: master
     - build-tag:
         requires:
         - mariadb
