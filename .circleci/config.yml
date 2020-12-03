@@ -119,7 +119,6 @@ jobs:
     steps:
     # pull sources
     - checkout
-    - setup_remote_docker
 
     - restore_cache:
         keys:
