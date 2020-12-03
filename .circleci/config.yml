@@ -126,20 +126,20 @@ jobs:
     - run:
         name: Install curl, kind, kubectl, and helm
         command: |
-          apk update && apk add --no-cache curl git ca-certificates
+          apt update && apt install -yyq --no-install-recommends curl git
           
           curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
           chmod +x ./kind
-          mv ./kind /usr/local/bin/kind
+          sudo mv ./kind /usr/local/bin/kind
 
           curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x ./kubectl
-          mv ./kubectl /usr/local/bin/kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
           
           curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
           tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
           chmod +x linux-amd64/helm
-          mv linux-amd64/helm /usr/local/bin
+          sudo mv linux-amd64/helm /usr/local/bin
 
     - run:
         name: Create kind clusters
