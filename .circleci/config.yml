@@ -1,0 +1,97 @@
+---
+version: 2.1
+
+jobs:
+  build-and-deploy:
+    environment:
+      KIND_VERSION: 0.9.0
+      KIND_VERSION_NODE: 1.19.4
+      KIND_CLUSTER_NAME: dc1
+      HELM_VERSION: 3.4.1
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions/versions
+      NAMESPACE: versions
+    machine:
+      image: ubuntu-2004:202010-01
+
+    steps:
+    # pull sources
+    - checkout
+
+    - restore_cache:
+        keys:
+        - versions-build-and-deploy-{{ checksum "package.json" }}
+
+    - run:
+        name: Install curl, kind, kubectl, and helm
+        command: |
+          sudo apt update
+          sudo apt install -yyq --no-install-recommends curl git
+
+          curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+          curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          
+          curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          chmod +x linux-amd64/helm
+          sudo mv linux-amd64/helm /usr/local/bin
+
+    - run:
+        name: Create kind clusters
+        command: |
+          kind create cluster --name ${KIND_CLUSTER_NAME} --image kindest/node:v${KIND_VERSION_NODE} --wait 5m --config .circleci/kind-config.yaml
+
+    - run:
+        name: Get kind clusters / kubectl get cluster-info
+        command: |
+          kind get clusters
+          kubectl cluster-info --context kind-${KIND_CLUSTER_NAME}
+
+    - save_cache:
+        key: versions-build-and-deploy-{{ checksum "package.json" }}
+        paths:
+        - node
+
+    - run:
+        name: Clone helm charts
+        command: |
+          git clone https://github.com/Lord-Y/helm.git helm-charts
+
+    - run:
+        name: Build docker image
+        command: |
+          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -eq "main" ]
+          then
+            echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
+            docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+            docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+            kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG}
+          else
+            docker build -t ${IMAGE_NAME}:latest .
+            kind load docker-image ${IMAGE_NAME}:latest
+          fi
+
+    - run:
+        name: Deploy build
+        command: |
+          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -eq "main" ]
+          then
+            helm upgrade -i --create-namespace versions helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
+          else
+            helm upgrade -i --create-namespace versions helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME}
+          fi
+
+    - run:
+        name: List pods
+        command: |
+          kubectl get pods --namespace ${NAMESPACE} --context kind-${KIND_CLUSTER_NAME}
+
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+    - build-and-deploy

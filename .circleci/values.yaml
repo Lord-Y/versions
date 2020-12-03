@@ -1,0 +1,42 @@
+nameOverride: "versions"
+
+container:
+  port: &cport 8080
+
+service:
+  port: 80
+
+image:
+  repository: docker.pkg.github.com/lord-y/versions/versions
+  tag: latest
+
+livenessProbe:
+  custom:
+    failureThreshold: 3
+    exec:
+      command:
+      - ls
+      - /app/dist
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 10
+
+readinessProbe:
+  custom:
+    failureThreshold: 3
+    exec:
+      command:
+      - ls
+      - /app/dist
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 10
+
+env:
+  PORT: *cport
+  BASE_URL: http://localhost:8080
+  API_URL: http://versions-api.versions.svc.cluster.local
+
+apptype: vuejs
