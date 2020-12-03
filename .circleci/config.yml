@@ -109,7 +109,7 @@ jobs:
       KIND_VERSION_NODE: 1.19.4
       KIND_CLUSTER_NAME: dc1
       HELM_VERSION: 3.4.1
-      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
       NAMESPACE: versions
     machine:
       image: ubuntu-2004:202010-01
@@ -165,12 +165,26 @@ jobs:
     - run:
         name: Build latest docker image
         command: |
-          docker build -t ${IMAGE_NAME}:latest .
+          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -eq "main" ]
+          then
+            echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
+            docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+            docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+            kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG}
+          else
+            docker build -t ${IMAGE_NAME}:latest .
+            kind load docker-image ${IMAGE_NAME}:latest
+          fi
 
     - run:
         name: Deploy latest build
         command: |
-          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME}
+          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -eq "main" ]
+          then
+            helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
+          else
+            helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME}
+          fi
 
     - run:
         name: List pods
