@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="responseStatus === 200">
-      {{ deployments.raw }}
+      <pre>{{ deployments }}</pre>
     </template>
     <template v-if="responseStatus === 404">
       <h2 class="text-center text-muted">This version does not exist</h2>
@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      deployments: [],
+      deployments: {},
       responseStatus: '',
       title: '',
       pagination: {
@@ -58,10 +58,14 @@ export default {
           .then((response) => {
             switch (response.status) {
               case 200:
-                if (this.isJson(response.data)) {
-                  this.deployments = JSON.stringify(response.data, null, 2);
+                if (this.isJson(response.data.raw)) {
+                  this.deployments = JSON.stringify(
+                    JSON.parse(response.data.raw),
+                    null,
+                    2,
+                  );
                 } else {
-                  this.deployments = response.data;
+                  this.deployments = response.data.raw;
                 }
                 this.responseStatus = 200;
                 break;
