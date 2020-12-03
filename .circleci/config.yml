@@ -108,7 +108,6 @@ jobs:
       KIND_VERSION: 0.9.0
       KIND_VERSION_NODE: 1.19.4
       KIND_CLUSTER_NAME: dc1
-      KUBECTL_CONTEXT: kind-${KIND_CLUSTER_NAME}
       HELM_VERSION: 3.4.1
       IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
       NAMESPACE: versions
@@ -126,8 +125,9 @@ jobs:
     - run:
         name: Install curl, kind, kubectl, and helm
         command: |
-          apt update && apt install -yyq --no-install-recommends curl git
-          
+          sudo apt update
+          sudo apt install -yyq --no-install-recommends curl git
+
           curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
           chmod +x ./kind
           sudo mv ./kind /usr/local/bin/kind
@@ -150,32 +150,32 @@ jobs:
         name: Get kind clusters / kubectl get cluster-info
         command: |
           kind get clusters
-          kubectl cluster-info --context ${KUBECTL_CONTEXT}
+          kubectl cluster-info --context kind-${KIND_CLUSTER_NAME}
 
     - save_cache:
         key: versions-api-build-latest-and-deploy-{{ checksum "go.mod" }}
         paths:
         - /go/pkg/mod
 
-    # - run:
-    #     name: Clone helm charts
-    #     command: |
-    #       git clone https://github.com/Lord-Y/helm.git helm-charts
+    - run:
+        name: Clone helm charts
+        command: |
+          git clone https://github.com/Lord-Y/helm.git helm-charts
 
-    # - run:
-    #     name: Build latest docker image
-    #     command: |
-    #       docker build -t ${IMAGE_NAME}:latest .
+    - run:
+        name: Build latest docker image
+        command: |
+          docker build -t ${IMAGE_NAME}:latest .
 
-    # - run:
-    #     name: Deploy latest build
-    #     command: |
-    #       helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context ${KUBECTL_CONTEXT}
+    - run:
+        name: Deploy latest build
+        command: |
+          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME}
 
-    # - run:
-    #     name: List pods
-    #     command: |
-    #       kubectl get pods --namespace ${NAMESPACE} --kube-context ${KUBECTL_CONTEXT}
+    - run:
+        name: List pods
+        command: |
+          kubectl get pods --namespace ${NAMESPACE} --kube-context kind-${KIND_CLUSTER_NAME}
 
   build-tags-and-deploy:
     working_directory: /app
@@ -185,7 +185,6 @@ jobs:
         KIND_VERSION: 0.9.0
         KIND_VERSION_NODE: 1.19.4
         KIND_CLUSTER_NAME: dc1
-        KUBECTL_CONTEXT: kind-${KIND_CLUSTER_NAME}
         HELM_VERSION: 3.4.1
         IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
         NAMESPACE: versions
