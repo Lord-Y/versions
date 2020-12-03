@@ -189,7 +189,7 @@ jobs:
     - run:
         name: List pods
         command: |
-          kubectl get pods --namespace ${NAMESPACE} --kube-context kind-${KIND_CLUSTER_NAME}
+          kubectl get pods --namespace ${NAMESPACE} --context kind-${KIND_CLUSTER_NAME}
 
   build-tags-and-deploy:
     working_directory: /app
