@@ -105,13 +105,17 @@ jobs:
 
   build-latest-and-deploy:
     working_directory: /app
-    docker:
-    - image: docker:stable-dind
-      environment:
-        KIND_VERSION: 0.9.0
-        KIND_VERSION_NODE: 1.19.4
-        HELM_VERSION: 3.4.1
-        IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
+    environment:
+      KIND_VERSION: 0.9.0
+      KIND_VERSION_NODE: 1.19.4
+      KIND_CLUSTER_NAME: dc1
+      KUBECTL_CONTEXT: kind-${KIND_CLUSTER_NAME}
+      HELM_VERSION: 3.4.1
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
+      NAMESPACE: versions
+    machine:
+      image: ubuntu-2004:202010-01
+      docker_layer_caching: true
 
     steps:
     # pull sources
@@ -135,7 +139,7 @@ jobs:
           chmod +x ./kubectl
           mv ./kubectl /usr/local/bin/kubectl
           
-          curl --fail --retry 3 -Lo helm-v${HELM_VERSION}-linux-amd64.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
           tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
           chmod +x linux-amd64/helm
           mv linux-amd64/helm /usr/local/bin
@@ -143,32 +147,38 @@ jobs:
     - run:
         name: Create kind clusters
         command: |
-          kind create cluster --name dc1 --image kindest/node:v${KIND_VERSION_NODE} --wait 5m
+          kind create cluster --name ${KIND_CLUSTER_NAME} --image kindest/node:v${KIND_VERSION_NODE} --wait 5m
 
     - run:
-        name: Get kind clusters
+        name: Get kind clusters / kubectl get cluster-info
         command: |
           kind get clusters
+          kubectl cluster-info --context ${KUBECTL_CONTEXT}
 
     - save_cache:
         key: versions-api-build-latest-and-deploy-{{ checksum "go.mod" }}
         paths:
         - /go/pkg/mod
 
-    - run:
-        name: Clone helm charts
-        command: |
-          git clone https://github.com/Lord-Y/helm.git helm-charts
+    # - run:
+    #     name: Clone helm charts
+    #     command: |
+    #       git clone https://github.com/Lord-Y/helm.git helm-charts
 
-    - run:
-        name: Build latest docker image
-        command: |
-          docker build -t ${IMAGE_NAME}:latest .
+    # - run:
+    #     name: Build latest docker image
+    #     command: |
+    #       docker build -t ${IMAGE_NAME}:latest .
 
-    - run:
-        name: Deploy latest build
-        command: |
-          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace versions -f .circleci/values.yaml --wait --kube-context kind-dc1
+    # - run:
+    #     name: Deploy latest build
+    #     command: |
+    #       helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context ${KUBECTL_CONTEXT}
+
+    # - run:
+    #     name: List pods
+    #     command: |
+    #       kubectl get pods --namespace ${NAMESPACE} --kube-context ${KUBECTL_CONTEXT}
 
   build-tags-and-deploy:
     working_directory: /app
@@ -177,8 +187,11 @@ jobs:
       environment:
         KIND_VERSION: 0.9.0
         KIND_VERSION_NODE: 1.19.4
+        KIND_CLUSTER_NAME: dc1
+        KUBECTL_CONTEXT: kind-${KIND_CLUSTER_NAME}
         HELM_VERSION: 3.4.1
         IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
+        NAMESPACE: versions
 
     steps:
     # pull sources
