@@ -70,9 +70,9 @@
                     '/raw/' +
                     deployment.version
                   "
-                  title="Click here to see details"
+                  title="Click here for more details"
                 >
-                  click here to see details
+                  Click here for more details
                 </a>
               </td>
               <td class="px-2 pt-1 pb-4">{{ deployment.status }}</td>
