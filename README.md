@@ -1,6 +1,6 @@
 # versions-api
 
-This api stand to centralize all your applications versions deployed in order to know when it has been deployed and his content.
+This api permit to centralize all your applications versions deployed in order to know when it has been deployed and his content.
 
 ## Definitions
 

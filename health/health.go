@@ -1,3 +1,4 @@
+// Package health assemble all functions required for health checks
 package health
 
 import (
@@ -10,12 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Health stand to return basic health check
+// Health permit to return basic health check
 func Health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"health": "OK"})
 }
 
-// Health stand to return basic health check
+// Health permit to return basic health check
 func Healthz(c *gin.Context) {
 	db := make(map[string]interface{})
 	var count int

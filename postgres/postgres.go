@@ -1,3 +1,4 @@
+// Package postgres assemble all functions required to perform SQL queries
 package postgres
 
 import (
@@ -57,7 +58,7 @@ func InitDB() {
 	log.Info().Msg("Database migrated successfully")
 }
 
-// Ping stand to ping sql instance
+// Ping permit to ping sql instance
 func Ping() (b bool) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -76,7 +77,7 @@ func Ping() (b bool) {
 	return true
 }
 
-// Create stand to insert data into sql instance
+// Create permit to insert data into sql instance
 func Create(d models.Create) (z int64, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -108,7 +109,7 @@ func Create(d models.Create) (z int64, err error) {
 	return z, nil
 }
 
-// UpdateStatus stand to insert data into sql instance
+// UpdateStatus permit to insert data into sql instance
 func UpdateStatus(d models.UpdateStatus) (err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -135,7 +136,7 @@ func UpdateStatus(d models.UpdateStatus) (err error) {
 	return nil
 }
 
-// ReadEnvironment stand to get data into sql instance
+// ReadEnvironment permit to get data into sql instance
 func ReadEnvironment(d models.ReadEnvironment) (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -198,7 +199,7 @@ func ReadEnvironment(d models.ReadEnvironment) (z []map[string]interface{}, err 
 	return m, nil
 }
 
-// ReadPlatform stand to get data into sql instance
+// ReadPlatform permit to get data into sql instance
 func ReadPlatform(d models.ReadPlatform) (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -260,7 +261,7 @@ func ReadPlatform(d models.ReadPlatform) (z []map[string]interface{}, err error)
 	return m, nil
 }
 
-// ReadHome stand to get data into sql instance
+// ReadHome permit to get data into sql instance
 func ReadHome() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -317,7 +318,7 @@ func ReadHome() (z []map[string]interface{}, err error) {
 	return m, nil
 }
 
-// ReadDistinctWorkloads stand to get data into sql instance
+// ReadDistinctWorkloads permit to get data into sql instance
 func ReadDistinctWorkloads() (z []map[string]interface{}, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -374,7 +375,7 @@ func ReadDistinctWorkloads() (z []map[string]interface{}, err error) {
 	return m, nil
 }
 
-// Raw stand to get data from raw column instance
+// Raw permit to get data from raw column instance
 func Raw(d models.Raw) (z map[string]interface{}, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -433,7 +434,7 @@ func Raw(d models.Raw) (z map[string]interface{}, err error) {
 	return m, nil
 }
 
-// RawById stand to get data from raw by version_id column instance
+// RawById permit to get data from raw by version_id column instance
 func RawById(d models.RawById) (z map[string]interface{}, err error) {
 	db, err := sql.Open(
 		commons.SqlDriver,

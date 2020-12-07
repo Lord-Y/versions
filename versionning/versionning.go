@@ -1,3 +1,4 @@
+// Package versionning assemble all functions required all http endpoints
 package versionning
 
 import (
@@ -19,7 +20,7 @@ var (
 	cacheExpire = time.Duration(86400 * 30)
 )
 
-// Create stand to insert new deployment in DB
+// Create permit to insert new deployment in DB
 func Create(c *gin.Context) {
 	var (
 		d      models.Create
@@ -51,7 +52,7 @@ func Create(c *gin.Context) {
 	}
 }
 
-// UpdateStatus stand to update status of deployment in DB
+// UpdateStatus permit to update status of deployment in DB
 func UpdateStatus(c *gin.Context) {
 	var (
 		d   models.UpdateStatus
@@ -81,7 +82,7 @@ func UpdateStatus(c *gin.Context) {
 	}
 }
 
-// ReadEnvironment stand to get new deployment in DB
+// ReadEnvironment permit to get new deployment in DB
 func ReadEnvironment(c *gin.Context) {
 	var (
 		d   models.ReadEnvironment
@@ -154,7 +155,7 @@ func ReadEnvironment(c *gin.Context) {
 	}
 }
 
-// ReadPlatform stand to get new deployment in DB
+// ReadPlatform permit to get new deployment in DB
 func ReadPlatform(c *gin.Context) {
 	var (
 		d   models.ReadPlatform
@@ -227,7 +228,7 @@ func ReadPlatform(c *gin.Context) {
 	}
 }
 
-// ReadHome stand to get last nth deployment in DB
+// ReadHome permit to get last nth deployment in DB
 func ReadHome(c *gin.Context) {
 	var (
 		err error
@@ -292,7 +293,7 @@ func ReadHome(c *gin.Context) {
 	}
 }
 
-// GetDistinctWorkload stand to get disctinct workload from DB
+// GetDistinctWorkload permit to get disctinct workload from DB
 func ReadDistinctWorkloads(c *gin.Context) {
 	var (
 		err error
@@ -357,7 +358,7 @@ func ReadDistinctWorkloads(c *gin.Context) {
 	}
 }
 
-// Raw stand to get raw data from DB
+// Raw permit to get raw data from DB
 func Raw(c *gin.Context) {
 	var (
 		d   models.Raw
@@ -427,7 +428,7 @@ func Raw(c *gin.Context) {
 	}
 }
 
-// RawById stand to get raw by id data from DB
+// RawById permit to get raw by id data from DB
 func RawById(c *gin.Context) {
 	var (
 		d   models.RawById

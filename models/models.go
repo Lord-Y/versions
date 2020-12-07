@@ -1,3 +1,4 @@
+// Package models assemble all struct, interface e.g ...
 package models
 
 // Create struct

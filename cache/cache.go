@@ -1,3 +1,4 @@
+// Package cache assemble all functions for redis
 package cache
 
 import (
@@ -11,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// RedisSet permit to put k/v in redis
 func RedisSet(redisURI string, keyName string, value string, expire time.Duration) {
 	var (
 		ctx = context.Background()
@@ -29,6 +31,7 @@ func RedisSet(redisURI string, keyName string, value string, expire time.Duratio
 	return
 }
 
+// RedisGet permit to get k/v in redis
 func RedisGet(redisURI string, keyName string) (z string, e error) {
 	var (
 		ctx = context.Background()
@@ -44,6 +47,7 @@ func RedisGet(redisURI string, keyName string) (z string, e error) {
 	return
 }
 
+// RedisGet permit to get k/v in redis
 func RedisDel(redisURI string, keyName string) {
 	var (
 		ctx = context.Background()
@@ -62,6 +66,7 @@ func RedisDel(redisURI string, keyName string) {
 	return
 }
 
+// RedisGet permit to get k/v in redis
 func RedisKeys(redisURI string, keyPrefix string) (z []string) {
 	var (
 		ctx = context.Background()
@@ -80,6 +85,7 @@ func RedisKeys(redisURI string, keyPrefix string) (z []string) {
 	return
 }
 
+// RedisDelWithPrefix permit to list keys keys has prefix like keyName* and then, delete keys
 func RedisDelWithPrefix(redisURI string, keyPrefix string) {
 	var (
 		ctx = context.Background()
@@ -106,7 +112,7 @@ func RedisDelWithPrefix(redisURI string, keyPrefix string) {
 	}
 }
 
-// RedisDeleteKeysHasPrefix function is explicit
+// RedisDeleteKeysHasPrefix permit to list keys keys has prefix like keyName* and then, delete keys
 func RedisDeleteKeysHasPrefix(redisURI string, prefixes []string) {
 	if len(prefixes) > 0 {
 		for _, keyPrefix := range prefixes {
@@ -125,6 +131,7 @@ func RedisDeleteKeysHasPrefix(redisURI string, prefixes []string) {
 	}
 }
 
+// RedisFlushDB permit to flush actual used db in redis
 func RedisFlushDB(redisURI string) {
 	var (
 		ctx = context.Background()
@@ -143,6 +150,7 @@ func RedisFlushDB(redisURI string) {
 	return
 }
 
+// RedisFlushAll permit to flush all db in redis
 func RedisFlushAll(redisURI string) {
 	var (
 		ctx = context.Background()
@@ -161,6 +169,7 @@ func RedisFlushAll(redisURI string) {
 	return
 }
 
+// RedisPing permit to get redis status
 func RedisPing(redisURI string) (b bool) {
 	var (
 		ctx = context.Background()

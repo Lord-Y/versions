@@ -1,3 +1,4 @@
+// Package commons assemble all useful functions used in other packages
 package commons
 
 import (
@@ -11,19 +12,22 @@ import (
 )
 
 var (
+	// SqlDriver var retrieve OS env var
 	SqlDriver = strings.TrimSpace(os.Getenv("SQL_DRIVER"))
 )
 
-// BuildDSN stand to create string url to connect to the sql instance
+// BuildDSN permit to create string url to connect to the sql instance
 func BuildDSN() string {
 	return strings.TrimSpace(os.Getenv("DB_URI"))
 }
 
+// RedisEnabled func permit to check OS env var exist
 func RedisEnabled() (b bool) {
 	b, _ = strconv.ParseBool(strings.TrimSpace(os.Getenv("REDIS_ENABLED")))
 	return
 }
 
+// GetRedisURI func permit to check OS env var exist
 func GetRedisURI() string {
 	return strings.TrimSpace(os.Getenv("REDIS_URI"))
 }
