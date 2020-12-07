@@ -18,7 +18,7 @@
               <th class="px-2 py-2">Changelog</th>
               <th class="px-2 py-2">Raw</th>
               <th class="px-2 py-2">Status</th>
-              <th class="px-2 py-2">Date</th>
+              <th class="px-2 py-2" v-html="getTimeZone()"></th>
             </tr>
           </thead>
           <tbody class="divide-y">
@@ -76,7 +76,10 @@
                 </a>
               </td>
               <td class="px-2 pt-1 pb-4">{{ deployment.status }}</td>
-              <td class="px-2 pt-1 pb-4">{{ deployment.date }}</td>
+              <td
+                class="px-2 pt-1 pb-4"
+                v-html="convertDate(deployment.date)"
+              ></td>
             </tr>
           </tbody>
         </table>
@@ -102,6 +105,8 @@
 </template>
 
 <script>
+import moment from 'moment';
+
 export default {
   name: 'Versions',
   props: {
@@ -137,6 +142,18 @@ export default {
     return {
       title: this.title,
     };
+  },
+  methods: {
+    getTimeZone() {
+      return (
+        'Date (Timezone ' +
+        Intl.DateTimeFormat().resolvedOptions().timeZone +
+        ')'
+      );
+    },
+    convertDate(date) {
+      return moment(date).format('LLLL');
+    },
   },
 };
 </script>
