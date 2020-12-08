@@ -147,7 +147,7 @@ func ReadEnvironment(d models.ReadEnvironment) (z []map[string]interface{}, err 
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3) count FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3 ORDER BY date DESC OFFSET $4 LIMIT $5")
+	stmt, err := db.Prepare("SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3) total FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3 ORDER BY date DESC OFFSET $4 LIMIT $5")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
@@ -210,7 +210,7 @@ func ReadPlatform(d models.ReadPlatform) (z []map[string]interface{}, err error)
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2) count FROM versions WHERE workload = $1 AND platform = $2 ORDER BY date DESC OFFSET $3 LIMIT $4")
+	stmt, err := db.Prepare("SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2) total FROM versions WHERE workload = $1 AND platform = $2 ORDER BY date DESC OFFSET $3 LIMIT $4")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}

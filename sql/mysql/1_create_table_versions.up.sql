@@ -7,7 +7,7 @@ CREATE TABLE `versions` (
   `changelog_url` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `raw` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `date` datetime NOT NULL DEFAULT current_timestamp(),
+  `date` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`versions_id`),
   KEY `idx_workload` (`workload`),
   KEY `idx_environment` (`environment`),
