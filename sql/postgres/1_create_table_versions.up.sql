@@ -7,7 +7,7 @@ CREATE TABLE versions (
   changelog_url text DEFAULT NULL,
   raw text DEFAULT NULL,
   status text NOT NULL,
-  date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_workload ON versions (workload);
