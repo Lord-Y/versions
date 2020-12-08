@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-gray-800 w-full sm:items-center sm:w-80 sm:block flex"
+    class="bg-gray-800 h-screen w-full sm:items-center sm:w-80 sm:block flex"
     :class="isOpen ? 'block' : 'hidden'"
   >
     <div class="w-full" v-if="workload.length > 0">
