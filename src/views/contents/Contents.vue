@@ -57,14 +57,18 @@ export default {
             break;
           case 'platform':
             target = this.$config.BASE_URL + this.url.api.endpoint;
-            page = this.$route.params.page ? this.$route.params.page : 1;
+            page = this.$route.params.page
+              ? parseInt(this.$route.params.page)
+              : 1;
             formData.append('workload', this.$route.params.workload);
             formData.append('platform', this.$route.params.platform);
             formData.append('page', page);
             break;
           case 'environment':
             target = this.$config.BASE_URL + this.url.api.endpoint;
-            page = this.$route.params.page ? this.$route.params.page : 1;
+            page = this.$route.params.page
+              ? parseInt(this.$route.params.page)
+              : 1;
             formData.append('workload', this.$route.params.workload);
             formData.append('platform', this.$route.params.platform);
             formData.append('environment', this.$route.params.environment);
@@ -84,7 +88,7 @@ export default {
                 this.responseStatus = 200;
                 switch (this.$route.meta.root) {
                   case 'platform':
-                    total = parseInt(response.data[0].count);
+                    total = parseInt(response.data[0].total);
                     if (total > parseInt(this.$config.RANGE_LIMIT)) {
                       this.pagination.data = {
                         url:
@@ -99,7 +103,7 @@ export default {
                     }
                     break;
                   case 'environment':
-                    total = parseInt(response.data[0].count);
+                    total = parseInt(response.data[0].total);
                     if (total > parseInt(this.$config.RANGE_LIMIT)) {
                       this.pagination.data = {
                         url:
