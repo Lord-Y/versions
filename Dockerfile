@@ -1,4 +1,4 @@
-ARG DOCKER_IMAGE_NODEJS="mirror.gcr.io/library/node:12-alpine"
+ARG DOCKER_IMAGE_NODEJS="mirror.gcr.io/library/node:14-alpine"
 FROM ${DOCKER_IMAGE_NODEJS} as builder
 
 RUN mkdir /app
@@ -11,7 +11,7 @@ RUN apk add --no-cache git curl && rm -rf /var/cache/apk/*
 RUN npm install
 RUN npm run ssr:build
 
-ARG DOCKER_IMAGE_NODEJS="mirror.gcr.io/library/node:12-alpine"
+ARG DOCKER_IMAGE_NODEJS="mirror.gcr.io/library/node:14-alpine"
 FROM ${DOCKER_IMAGE_NODEJS}
 RUN apk update && apk upgrade
 RUN apk add --no-cache git curl && rm -rf /var/cache/apk/*
