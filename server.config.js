@@ -17,7 +17,7 @@ export default {
           API_URL: process.env.API_URL
             ? process.env.API_URL
             : 'http://localhost:8081',
-          RANGE_LIMIT: process.env.RANGE_LIMIT ? process.env.RANGE_LIMIT : 50,
+          RANGE_LIMIT: process.env.RANGE_LIMIT ? process.env.RANGE_LIMIT : 25,
         },
         privateConfig: {
           BASE_URL: process.env.BASE_URL
@@ -26,7 +26,7 @@ export default {
           API_URL: process.env.API_URL
             ? process.env.API_URL
             : 'http://localhost:8081',
-          RANGE_LIMIT: process.env.RANGE_LIMIT ? process.env.RANGE_LIMIT : 50,
+          RANGE_LIMIT: process.env.RANGE_LIMIT ? process.env.RANGE_LIMIT : 25,
         },
       },
     ],

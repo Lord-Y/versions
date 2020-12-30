@@ -26,7 +26,7 @@
           <div class="bg-blue-500">
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-white bg-blue-500"
-              :to="pagination.url + '1'"
+              :to="paginationUrl + '1'"
               exact
               title="1"
             >
@@ -36,7 +36,7 @@
           <div>
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + '2'"
+              :to="paginationUrl + '2'"
               exact
               title="2"
             >
@@ -46,7 +46,7 @@
           <div>
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + '2'"
+              :to="paginationUrl + '2'"
               exact
               :title="text.next"
             >
@@ -56,7 +56,7 @@
           <div>
             <RouterLink
               class="rounded rounded-l-none py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + ceil"
+              :to="paginationUrl + ceil"
               exact
               :title="text.last"
             >
@@ -88,7 +88,7 @@
           <div class="bg-blue-500">
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-white bg-blue-500"
-              :to="pagination.url + '1'"
+              :to="paginationUrl + '1'"
               exact
               title="1"
             >
@@ -98,7 +98,7 @@
           <div>
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + '2'"
+              :to="paginationUrl + '2'"
               exact
               title="2"
             >
@@ -108,7 +108,7 @@
           <div>
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + '3'"
+              :to="paginationUrl + '3'"
               exact
               title="3"
             >
@@ -118,7 +118,7 @@
           <div>
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + '2'"
+              :to="paginationUrl + '2'"
               exact
               :title="text.next"
             >
@@ -128,7 +128,7 @@
           <div>
             <RouterLink
               class="rounded py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + ceil"
+              :to="paginationUrl + ceil"
               exact
               :title="text.last"
             >
@@ -142,7 +142,7 @@
           <div>
             <RouterLink
               class="rounded rounded-r-none py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + '1'"
+              :to="paginationUrl + '1'"
               exact
               :title="text.beginning"
             >
@@ -152,7 +152,7 @@
           <div>
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + previous"
+              :to="paginationUrl + previous"
               exact
               :title="text.previous"
             >
@@ -162,7 +162,7 @@
           <div v-if="ceil > 2">
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + (previous - 1)"
+              :to="paginationUrl + (previous - 1)"
               exact
               :title="previous - 1"
             >
@@ -172,7 +172,7 @@
           <div>
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-              :to="pagination.url + previous"
+              :to="paginationUrl + previous"
               exact
               :title="previous"
             >
@@ -182,7 +182,7 @@
           <div class="bg-blue-500">
             <RouterLink
               class="py-2 px-3 border border-gray-300 text-white bg-blue-500"
-              :to="pagination.url + pagination.actualPage"
+              :to="paginationUrl + pagination.actualPage"
               exact
               :title="pagination.actualPage"
             >
@@ -192,7 +192,7 @@
           <div class="disabled">
             <RouterLink
               class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600"
-              :to="pagination.url + next"
+              :to="paginationUrl + next"
               exact
               :title="text.next"
             >
@@ -202,7 +202,7 @@
           <div class="disabled">
             <RouterLink
               class="cursor-default pointer-events-none rounded rounded-l-none py-2 px-3 border border-gray-300 text-gray-600"
-              :to="pagination.url + ceil"
+              :to="paginationUrl + ceil"
               exact
               :title="text.last"
             >
@@ -215,7 +215,7 @@
             <div>
               <RouterLink
                 class="rounded rounded-r-none py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                :to="pagination.url + '1'"
+                :to="paginationUrl + '1'"
                 exact
                 :title="text.beginning"
               >
@@ -225,7 +225,7 @@
             <div>
               <RouterLink
                 class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                :to="pagination.url + previous"
+                :to="paginationUrl + previous"
                 exact
                 :title="text.previous"
               >
@@ -235,7 +235,7 @@
             <div>
               <RouterLink
                 class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                :to="pagination.url + previous"
+                :to="paginationUrl + previous"
                 exact
                 :title="text.previous"
               >
@@ -245,7 +245,7 @@
             <div class="bg-blue-500">
               <RouterLink
                 class="py-2 px-3 border border-gray-300 text-white bg-blue-500"
-                :to="pagination.url + pagination.actualPage"
+                :to="paginationUrl + pagination.actualPage"
                 exact
                 :title="pagination.actualPage"
               >
@@ -256,7 +256,7 @@
               <div class="disabled">
                 <RouterLink
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600 hover:bg-gray-300"
-                  :to="pagination.url + next"
+                  :to="paginationUrl + next"
                   exact
                   :title="text.next"
                 >
@@ -266,7 +266,7 @@
               <div class="disabled">
                 <RouterLink
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600 hover:bg-gray-300"
-                  :to="pagination.url + ceil"
+                  :to="paginationUrl + ceil"
                   exact
                   :title="text.last"
                 >
@@ -278,7 +278,7 @@
               <div>
                 <RouterLink
                   class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + next"
+                  :to="paginationUrl + next"
                   exact
                   :title="next"
                 >
@@ -288,7 +288,7 @@
               <div>
                 <RouterLink
                   class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + next"
+                  :to="paginationUrl + next"
                   exact
                   :title="text.next"
                 >
@@ -298,7 +298,7 @@
               <div>
                 <RouterLink
                   class="rounded py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + ceil"
+                  :to="paginationUrl + ceil"
                   exact
                   :title="text.last"
                 >
@@ -312,7 +312,7 @@
               <div class="disabled">
                 <RouterLink
                   class="cursor-default pointer-events-none rounded rounded-r-none py-2 px-3 border border-gray-300 text-gray-600"
-                  :to="pagination.url + '1'"
+                  :to="paginationUrl + '1'"
                   exact
                   :title="text.beginning"
                 >
@@ -322,7 +322,7 @@
               <div class="disabled">
                 <RouterLink
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + previous"
+                  :to="paginationUrl + previous"
                   exact
                   :title="text.previous"
                 >
@@ -334,7 +334,7 @@
               <div>
                 <RouterLink
                   class="rounded rounded-r-none py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + '1'"
+                  :to="paginationUrl + '1'"
                   exact
                   :title="text.beginning"
                 >
@@ -344,7 +344,7 @@
               <div>
                 <RouterLink
                   class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + previous"
+                  :to="paginationUrl + previous"
                   exact
                   :title="text.previous"
                 >
@@ -355,7 +355,7 @@
             <div v-if="parseInt(pagination.actualPage) === ceil">
               <RouterLink
                 class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                :to="pagination.url + (previous - 1)"
+                :to="paginationUrl + (previous - 1)"
                 exact
                 :title="previous - 1"
               >
@@ -365,7 +365,7 @@
             <div v-if="previous > 0">
               <RouterLink
                 class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                :to="pagination.url + previous"
+                :to="paginationUrl + previous"
                 exact
                 :title="previous"
               >
@@ -375,7 +375,7 @@
             <div class="bg-blue-500">
               <RouterLink
                 class="py-2 px-3 border border-gray-300 text-white bg-blue-500"
-                :to="pagination.url + pagination.actualPage"
+                :to="paginationUrl + pagination.actualPage"
                 exact
                 :title="pagination.actualPage"
               >
@@ -386,7 +386,7 @@
               <div class="disabled">
                 <RouterLink
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + next"
+                  :to="paginationUrl + next"
                   exact
                   :title="text.next"
                 >
@@ -396,7 +396,7 @@
               <div class="disabled">
                 <RouterLink
                   class="cursor-default pointer-events-none rounded rounded-l-none py-2 px-3 border border-gray-300 text-gray-600"
-                  :to="pagination.url + ceil"
+                  :to="paginationUrl + ceil"
                   exact
                   :title="text.last"
                 >
@@ -408,7 +408,7 @@
               <div>
                 <RouterLink
                   class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + next"
+                  :to="paginationUrl + next"
                   exact
                   :title="next"
                 >
@@ -418,7 +418,7 @@
               <div v-if="parseInt(pagination.actualPage) === 1">
                 <RouterLink
                   class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + (next + 1)"
+                  :to="paginationUrl + (next + 1)"
                   exact
                   :title="next + 1"
                 >
@@ -428,7 +428,7 @@
               <div>
                 <RouterLink
                   class="py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + next"
+                  :to="paginationUrl + next"
                   exact
                   :title="text.next"
                 >
@@ -438,7 +438,7 @@
               <div>
                 <RouterLink
                   class="rounded rounded-l-none py-2 px-3 border border-gray-300 text-blue-600 hover:bg-gray-300"
-                  :to="pagination.url + ceil"
+                  :to="paginationUrl + ceil"
                   exact
                   :title="text.last"
                 >
@@ -489,6 +489,15 @@ export default {
     },
     scrollToTop: function () {
       return window.scrollTo(0, 0);
+    },
+    paginationUrl: function () {
+      const regex = /\/$/g;
+      const found = this.pagination.url.match(regex);
+      if (found === null) {
+        return this.pagination.url + '/';
+      } else {
+        return this.pagination.url;
+      }
     },
   },
 };
