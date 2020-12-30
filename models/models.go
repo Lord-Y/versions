@@ -24,7 +24,7 @@ type ReadEnvironment struct {
 	Platform    string `form:"platform" json:"platform" binding:"required,max=100"`
 	Environment string `form:"environment" json:"environment" binding:"required,max=100"`
 	Page        int    `form:"page,default=1" json:"page"`
-	RangeLimit  int    `form:"rangeLimit,default=50" json:"rangeLimit"`
+	RangeLimit  int    `form:"rangeLimit,default=25" json:"rangeLimit"`
 	StartLimit  int
 	EndLimit    int
 }
@@ -34,7 +34,7 @@ type ReadPlatform struct {
 	Workload   string `form:"workload" json:"workload" binding:"required,max=100"`
 	Platform   string `form:"platform" json:"platform" binding:"required,max=100"`
 	Page       int    `form:"page,default=1" json:"page"`
-	RangeLimit int    `form:"rangeLimit,default=50" json:"rangeLimit"`
+	RangeLimit int    `form:"rangeLimit,default=25" json:"rangeLimit"`
 	StartLimit int
 	EndLimit   int
 }

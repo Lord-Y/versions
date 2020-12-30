@@ -282,7 +282,7 @@ func ReadHome() (z []map[string]interface{}, err error) {
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM versions ORDER BY date DESC LIMIT 50")
+	stmt, err := db.Prepare("SELECT * FROM versions ORDER BY date DESC LIMIT 25")
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
