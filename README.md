@@ -125,3 +125,14 @@ You can also use:
 curl -XPOST 0:8080/api/v1/versions/read/environment/latest/whatever?workload=teamX&environment=production&platform=production'
 ```
 It will fetch the latest version deployed without checking the `status` of the deployment.
+
+## Contributing
+
+In order to contribute to our project, we need to configure git hooks.
+
+You need first do install [golangci-lint](https://golangci-lint.run/usage/install/)
+
+Then, enable the hook in our project:
+```bash
+git config core.hooksPath .githooks
+```
