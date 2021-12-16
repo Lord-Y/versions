@@ -124,7 +124,8 @@ jobs:
           go test -v ./... -coverprofile=coverage.out
           go tool cover -func=coverage.out
 
-  build-latest-and-deploy:
+  build-tags-and-publish-prerelease:
+    executor: golang
     environment:
       KIND_VERSION: 0.9.0
       KIND_VERSION_NODE: 1.19.4
@@ -132,16 +133,13 @@ jobs:
       HELM_VERSION: 3.4.1
       IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
       NAMESPACE: versions
-    machine:
-      image: ubuntu-2004:202010-01
 
     steps:
     - checkout
 
     - restore_cache:
         keys:
-        - versions-api-mariadb-{{ checksum "go.mod" }}
-        - versions-api-postgres-{{ checksum "go.mod" }}
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
         name: Install curl, kind, kubectl, and helm
@@ -173,56 +171,10 @@ jobs:
           kind get clusters
           kubectl cluster-info --context kind-${KIND_CLUSTER_NAME}
 
-    - save_cache:
-        key: versions-api-build-latest-and-deploy-{{ checksum "go.mod" }}
-        paths:
-        - /go/pkg/mod
-
     - run:
         name: Clone helm charts
         command: |
           git clone https://github.com/Lord-Y/helm.git helm-charts
-
-    - run:
-        name: Build latest docker image
-        command: |
-          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -neq "main" ]
-          then
-            echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
-            docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
-            docker push ${IMAGE_NAME}:${CIRCLE_TAG}
-            kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG}
-          else
-            docker build -t ${IMAGE_NAME}:latest .
-            kind load docker-image ${IMAGE_NAME}:latest
-          fi
-
-    - run:
-        name: Deploy latest build
-        command: |
-          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -neq "main" ]
-          then
-            helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
-          else
-            helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME}
-          fi
-
-    - run:
-        name: List pods
-        command: |
-          kubectl get pods --namespace ${NAMESPACE} --context kind-${KIND_CLUSTER_NAME}
-
-  build-tags-and-publish-prerelease:
-    executor: golang
-    environment:
-      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
-
-    steps:
-    - checkout
-
-    - restore_cache:
-        keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
         name: Build docker image
@@ -230,6 +182,17 @@ jobs:
           echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+
+    - run:
+        name: Deploy tagged build
+        command: |
+          kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG}
+          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
+
+    - run:
+        name: List pods
+        command: |
+          kubectl get pods --namespace ${NAMESPACE} --context kind-${KIND_CLUSTER_NAME}
 
     - run:
         name: Publish prerelease
