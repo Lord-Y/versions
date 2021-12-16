@@ -127,10 +127,10 @@ jobs:
   build-tags-and-publish-prerelease:
     executor: golang
     environment:
-      KIND_VERSION: 0.9.0
-      KIND_VERSION_NODE: 1.19.4
+      KIND_VERSION: 0.11.1
+      KIND_VERSION_NODE: 1.22.0
       KIND_CLUSTER_NAME: dc1
-      HELM_VERSION: 3.4.1
+      HELM_VERSION: 3.7.2
       IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
       NAMESPACE: versions
 
