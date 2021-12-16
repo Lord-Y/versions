@@ -1,10 +1,15 @@
 ---
 version: 2.1
 
+executors:
+  golang:
+    machine:
+      image: ubuntu-2004:202104-01
+
 jobs:
   mariadb:
     docker:
-    - image: circleci/golang:1.15
+    - image: circleci/golang:1.17
       environment:
         SQL_DRIVER: mysql
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true
@@ -21,7 +26,6 @@ jobs:
         REDIS_PASSWORD: password
 
     steps:
-    # pull sources
     - checkout
 
     - restore_cache:
@@ -51,11 +55,13 @@ jobs:
 
     - run:
         name: Perform unit testing
-        command: go test -v
+        command: |
+          go test -v ./...
+          go tool cover -func=coverage.out
 
   postgres:
     docker:
-    - image: circleci/golang:1.15
+    - image: circleci/golang:1.17
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
@@ -71,7 +77,6 @@ jobs:
         REDIS_PASSWORD: password
 
     steps:
-    # pull sources
     - checkout
 
     - restore_cache:
@@ -101,7 +106,9 @@ jobs:
 
     - run:
         name: Perform unit testing
-        command: go test -v
+        command: |
+          go test -v ./...
+          go tool cover -func=coverage.out
 
   build-latest-and-deploy:
     environment:
@@ -115,12 +122,12 @@ jobs:
       image: ubuntu-2004:202010-01
 
     steps:
-    # pull sources
     - checkout
 
     - restore_cache:
         keys:
-        - versions-api-build-latest-and-deploy-{{ checksum "go.mod" }}
+        - versions-api-mariadb-{{ checksum "go.mod" }}
+        - versions-api-postgres-{{ checksum "go.mod" }}
 
     - run:
         name: Install curl, kind, kubectl, and helm
@@ -165,7 +172,7 @@ jobs:
     - run:
         name: Build latest docker image
         command: |
-          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -eq "main" ]
+          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -neq "main" ]
           then
             echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
             docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
@@ -179,7 +186,7 @@ jobs:
     - run:
         name: Deploy latest build
         command: |
-          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -eq "main" ]
+          if [ -n "$CIRCLE_TAG" ] && [ $CIRCLE_BRANCH -neq "main" ]
           then
             helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
           else
@@ -191,49 +198,91 @@ jobs:
         command: |
           kubectl get pods --namespace ${NAMESPACE} --context kind-${KIND_CLUSTER_NAME}
 
-  build-tags-and-deploy:
-    working_directory: /app
-    docker:
-    - image: docker:stable-dind
-      environment:
-        KIND_VERSION: 0.9.0
-        KIND_VERSION_NODE: 1.19.4
-        KIND_CLUSTER_NAME: dc1
-        HELM_VERSION: 3.4.1
-        IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
-        NAMESPACE: versions
+  build-tags-and-publish-prerelease:
+    executor: golang
+    environment:
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
 
     steps:
-    # pull sources
     - checkout
-    - setup_remote_docker
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
-        name: Build tag docker image
+        name: Build docker image
         command: |
-          echo "$GITHUB_ACCESS_TOKEN" | docker login https://docker.pkg.github.com -u Lord-Y --password-stdin
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
 
+    - run:
+        name: Publish prerelease
+        command: |
+          go get github.com/github-release/github-release
+          git checkout .
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions-api/blob/main/CHANGELOG.md)" -p
+
+
+  build-tags-and-publish-release:
+    executor: golang
+    environment:
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
+
+    - run:
+        name: Build docker image
+        command: |
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+
+    - run:
+        name: Publish release
+        command: |
+          go get github.com/github-release/github-release
+          git checkout .
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions-api/blob/main/CHANGELOG.md)"
+
+# https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
 workflows:
   version: 2
   test-and-build:
     jobs:
-    - mariadb
-    - postgres
-    - build-latest-and-deploy:
-        requires:
-        - mariadb
-        - postgres
+    - mariadb:
+        context: GITHUB
         filters:
-          branches:
-            ignore: master
-    - build-tags-and-deploy:
+          tags:
+            only: /.*/
+    - postgres:
+        context: GITHUB
+        filters:
+          tags:
+            only: /.*/
+    - build-tags-and-publish-prerelease:
+        context: GITHUB
         requires:
         - mariadb
         - postgres
         filters:
           tags:
-            only: /^v.*/
+            only: /^v\d+\.\d+\.\d+-(.*)$/
           branches:
-            only: master
+            ignore: /.*/
+    - build-tags-and-publish-release:
+        context: GITHUB
+        requires:
+        - mariadb
+        - postgres
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+$/
+          branches:
+            ignore: /.*/
