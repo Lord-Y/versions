@@ -31,6 +31,13 @@ func Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if d.ChangelogURL == "" {
+		d.ChangelogURL = "N/A"
+	}
+
+	if d.Raw == "" {
+		d.Raw = "N/A"
+	}
 
 	if commons.SqlDriver == "mysql" {
 		result, err = mysql.Create(d)
@@ -102,7 +109,7 @@ func ReadEnvironment(c *gin.Context) {
 			log.Error().Err(err).Msg("Error occured while retrieving data from cache")
 		}
 		if len(result) > 0 {
-			var a interface{}
+			var a []models.DBReadCommon
 			err = json.Unmarshal([]byte(result), &a)
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while unmarshalling data")
@@ -111,7 +118,7 @@ func ReadEnvironment(c *gin.Context) {
 			}
 			c.JSON(http.StatusOK, a)
 		} else {
-			result := make([]map[string]interface{}, 0)
+			var result []models.DBReadCommon
 			if commons.SqlDriver == "mysql" {
 				result, err = mysql.ReadEnvironment(d)
 			} else {
@@ -136,7 +143,7 @@ func ReadEnvironment(c *gin.Context) {
 			}
 		}
 	} else {
-		result := make([]map[string]interface{}, 0)
+		var result []models.DBReadCommon
 		if commons.SqlDriver == "mysql" {
 			result, err = mysql.ReadEnvironment(d)
 		} else {
@@ -175,7 +182,7 @@ func ReadPlatform(c *gin.Context) {
 			log.Error().Err(err).Msg("Error occured while retrieving data from cache")
 		}
 		if len(result) > 0 {
-			var a interface{}
+			var a []models.DBReadCommon
 			err = json.Unmarshal([]byte(result), &a)
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while unmarshalling data")
@@ -184,7 +191,7 @@ func ReadPlatform(c *gin.Context) {
 			}
 			c.JSON(http.StatusOK, a)
 		} else {
-			result := make([]map[string]interface{}, 0)
+			var result []models.DBReadCommon
 			if commons.SqlDriver == "mysql" {
 				result, err = mysql.ReadPlatform(d)
 			} else {
@@ -209,7 +216,7 @@ func ReadPlatform(c *gin.Context) {
 			}
 		}
 	} else {
-		result := make([]map[string]interface{}, 0)
+		var result []models.DBReadCommon
 		if commons.SqlDriver == "mysql" {
 			result, err = mysql.ReadPlatform(d)
 		} else {
@@ -234,13 +241,13 @@ func ReadHome(c *gin.Context) {
 		err error
 	)
 	if commons.RedisEnabled() {
-		keyName := fmt.Sprintf("w_p_e_home")
+		keyName := "w_p_e_home"
 		result, err := cache.RedisGet(commons.GetRedisURI(), keyName)
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while retrieving data from cache")
 		}
 		if len(result) > 0 {
-			var a interface{}
+			var a []models.DBCommons
 			err = json.Unmarshal([]byte(result), &a)
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while unmarshalling data")
@@ -249,7 +256,7 @@ func ReadHome(c *gin.Context) {
 			}
 			c.JSON(http.StatusOK, a)
 		} else {
-			result := make([]map[string]interface{}, 0)
+			var result []models.DBCommons
 			if commons.SqlDriver == "mysql" {
 				result, err = mysql.ReadHome()
 			} else {
@@ -274,7 +281,7 @@ func ReadHome(c *gin.Context) {
 			}
 		}
 	} else {
-		result := make([]map[string]interface{}, 0)
+		var result []models.DBCommons
 		if commons.SqlDriver == "mysql" {
 			result, err = mysql.ReadHome()
 		} else {
@@ -299,7 +306,7 @@ func ReadDistinctWorkloads(c *gin.Context) {
 		err error
 	)
 	if commons.RedisEnabled() {
-		keyName := fmt.Sprintf("w_p_e_distinct_workload")
+		keyName := "w_p_e_distinct_workload"
 		result, err := cache.RedisGet(commons.GetRedisURI(), keyName)
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while retrieving data from cache")
@@ -314,7 +321,7 @@ func ReadDistinctWorkloads(c *gin.Context) {
 			}
 			c.JSON(http.StatusOK, a)
 		} else {
-			result := make([]map[string]interface{}, 0)
+			var result []models.DBReadDistinctWorkloads
 			if commons.SqlDriver == "mysql" {
 				result, err = mysql.ReadDistinctWorkloads()
 			} else {
@@ -339,7 +346,7 @@ func ReadDistinctWorkloads(c *gin.Context) {
 			}
 		}
 	} else {
-		result := make([]map[string]interface{}, 0)
+		var result []models.DBReadDistinctWorkloads
 		if commons.SqlDriver == "mysql" {
 			result, err = mysql.ReadDistinctWorkloads()
 		} else {
@@ -375,7 +382,7 @@ func Raw(c *gin.Context) {
 			log.Error().Err(err).Msg("Error occured while retrieving data from cache")
 		}
 		if len(result) > 0 {
-			var a interface{}
+			var a models.DBRaw
 			err = json.Unmarshal([]byte(result), &a)
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while unmarshalling data")
@@ -384,7 +391,7 @@ func Raw(c *gin.Context) {
 			}
 			c.JSON(http.StatusOK, a)
 		} else {
-			result := make(map[string]interface{}, 0)
+			var result models.DBRaw
 			if commons.SqlDriver == "mysql" {
 				result, err = mysql.Raw(d)
 			} else {
@@ -395,7 +402,7 @@ func Raw(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 				return
 			}
-			if len(result) == 0 {
+			if result == (models.DBRaw{}) {
 				c.AbortWithStatus(404)
 			} else {
 				b, err := json.Marshal(result)
@@ -409,7 +416,7 @@ func Raw(c *gin.Context) {
 			}
 		}
 	} else {
-		result := make(map[string]interface{}, 0)
+		var result models.DBRaw
 		if commons.SqlDriver == "mysql" {
 			result, err = mysql.Raw(d)
 		} else {
@@ -420,7 +427,7 @@ func Raw(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			return
 		}
-		if len(result) == 0 {
+		if result == (models.DBRaw{}) {
 			c.AbortWithStatus(404)
 		} else {
 			c.JSON(http.StatusOK, result)
@@ -454,7 +461,7 @@ func RawById(c *gin.Context) {
 			}
 			c.JSON(http.StatusOK, a)
 		} else {
-			result := make(map[string]interface{}, 0)
+			var result models.DBCommons
 			if commons.SqlDriver == "mysql" {
 				result, err = mysql.RawById(d)
 			} else {
@@ -465,7 +472,7 @@ func RawById(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 				return
 			}
-			if len(result) == 0 {
+			if result == (models.DBCommons{}) {
 				c.AbortWithStatus(404)
 			} else {
 				b, err := json.Marshal(result)
@@ -479,7 +486,7 @@ func RawById(c *gin.Context) {
 			}
 		}
 	} else {
-		result := make(map[string]interface{}, 0)
+		var result models.DBCommons
 		if commons.SqlDriver == "mysql" {
 			result, err = mysql.RawById(d)
 		} else {
@@ -490,7 +497,7 @@ func RawById(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			return
 		}
-		if len(result) == 0 {
+		if result == (models.DBCommons{}) {
 			c.AbortWithStatus(404)
 		} else {
 			c.JSON(http.StatusOK, result)

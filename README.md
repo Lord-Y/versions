@@ -15,7 +15,7 @@ You need to define OS environment variables like so:
 ```bash
 # for mysql
 export SQL_DRIVER=mysql
-export DB_URI must be like so: `USERNAME:PASSWORD@tcp(HOST:PORT)/DB_NAME?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true`
+export DB_URI must be like so: `USERNAME:PASSWORD@tcp(HOST:PORT)/DB_NAME?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true&parseTime=true`
 # for postgres
 export SQL_DRIVER=postgres
 export DB_URI must be like so: `postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable`

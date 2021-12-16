@@ -28,15 +28,15 @@ func RedisSet(redisURI string, keyName string, value string, expire time.Duratio
 	if err != nil {
 		log.Error().Err(err).Msgf("Failed to set keyName on redis address %s", opt.Addr)
 	}
-	return
 }
 
 // RedisGet permit to get k/v in redis
-func RedisGet(redisURI string, keyName string) (z string, e error) {
+func RedisGet(redisURI string, keyName string) (z string, err error) {
 	var (
 		ctx = context.Background()
+		opt *redis.Options
 	)
-	opt, err := redis.ParseURL(redisURI)
+	opt, err = redis.ParseURL(redisURI)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error occured while connecting to redis address %s", opt.Addr)
 		return
@@ -63,7 +63,6 @@ func RedisDel(redisURI string, keyName string) {
 	if err != nil {
 		log.Warn().Err(err).Msgf("Error occured while deleting keyName %s on redis address %s", keyName, opt.Addr)
 	}
-	return
 }
 
 // RedisGet permit to get k/v in redis
@@ -116,8 +115,9 @@ func RedisDelWithPrefix(redisURI string, keyPrefix string) {
 func RedisDeleteKeysHasPrefix(redisURI string, prefixes []string) {
 	if len(prefixes) > 0 {
 		for _, keyPrefix := range prefixes {
-			matched, _ := regexp.MatchString(`\*$`, keyPrefix)
-			if !matched {
+			var reg = regexp.MustCompile(`\*$`)
+
+			if !reg.MatchString(keyPrefix) {
 				log.Debug().Msgf("keyPrefix %s does not finish with wildcard, so let's set it", keyPrefix)
 				keyPrefix = fmt.Sprintf("%s*", keyPrefix)
 			}
@@ -147,7 +147,6 @@ func RedisFlushDB(redisURI string) {
 	if err != nil {
 		log.Warn().Err(err).Msgf("Error occured while flushing DB on redis address %s", opt.Addr)
 	}
-	return
 }
 
 // RedisFlushAll permit to flush all db in redis
@@ -166,7 +165,6 @@ func RedisFlushAll(redisURI string) {
 	if err != nil {
 		log.Warn().Err(err).Msgf("Error occured while flushing all DBs on redis address %s", opt.Addr)
 	}
-	return
 }
 
 // RedisPing permit to get redis status

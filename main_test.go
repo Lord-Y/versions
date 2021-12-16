@@ -11,6 +11,7 @@ import (
 
 	"github.com/Lord-Y/versions-api/cache"
 	"github.com/Lord-Y/versions-api/commons"
+	"github.com/Lord-Y/versions-api/models"
 	"github.com/Lord-Y/versions-api/mysql"
 	"github.com/Lord-Y/versions-api/postgres"
 	"github.com/alecthomas/assert"
@@ -141,7 +142,7 @@ func TestCreate(t *testing.T) {
 		log.Info().Msg("Let's update status")
 		if w.Code == 201 {
 			r := result{}
-			err = json.Unmarshal([]byte(w.Body.String()), &r)
+			err = json.Unmarshal(w.Body.Bytes(), &r)
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while unmarshalling data")
 				t.Fail()
@@ -165,17 +166,28 @@ func TestCreate(t *testing.T) {
 
 func TestReadEnvironment_200(t *testing.T) {
 	headers := make(map[string]string)
-	result := make(map[string]string)
+	var (
+		result models.DBReadForUnitTesting
+		err    error
+	)
 
 	assert := assert.New(t)
 	router := SetupRouter()
 	if commons.SqlDriver == "mysql" {
-		result = mysql.ReadForUnitTesting()
+		result, err = mysql.ReadForUnitTesting()
+		if err != nil {
+			t.Fail()
+			return
+		}
 	} else {
-		result = postgres.ReadForUnitTesting()
+		result, err = postgres.ReadForUnitTesting()
+		if err != nil {
+			t.Fail()
+			return
+		}
 	}
-	if len(result) > 0 && result["workload"] != "NULL" && result["platform"] != "NULL" {
-		url := fmt.Sprintf("/api/v1/versions/read/environment?workload=%s&platform=%s&environment=%s", result["workload"], result["platform"], result["environment"])
+	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+		url := fmt.Sprintf("/api/v1/versions/read/environment?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
@@ -223,17 +235,28 @@ func TestReadEnvironment_404(t *testing.T) {
 
 func TestReadPlatform_200(t *testing.T) {
 	headers := make(map[string]string)
-	result := make(map[string]string)
+	var (
+		result models.DBReadForUnitTesting
+		err    error
+	)
 
 	assert := assert.New(t)
 	router := SetupRouter()
 	if commons.SqlDriver == "mysql" {
-		result = mysql.ReadForUnitTesting()
+		result, err = mysql.ReadForUnitTesting()
+		if err != nil {
+			t.Fail()
+			return
+		}
 	} else {
-		result = postgres.ReadForUnitTesting()
+		result, err = postgres.ReadForUnitTesting()
+		if err != nil {
+			t.Fail()
+			return
+		}
 	}
-	if len(result) > 0 && result["workload"] != "NULL" && result["platform"] != "NULL" {
-		url := fmt.Sprintf("/api/v1/versions/read/platform?workload=%s&platform=%s", result["workload"], result["platform"])
+	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+		url := fmt.Sprintf("/api/v1/versions/read/platform?workload=%s&platform=%s", result.Workload, result.Platform)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")

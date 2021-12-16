@@ -2,6 +2,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
@@ -12,8 +13,9 @@ import (
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
+	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/rs/zerolog/log"
-	"github.com/syyongx/php2go"
 )
 
 // InitDB permit to initialiaze or migrate databases
@@ -34,11 +36,11 @@ func InitDB() {
 		return
 	}
 	if err := db.Ping(); err != nil {
-		log.Fatal().Err(err).Msgf("could not ping DB: %v", err)
+		log.Fatal().Err(err).Msgf("could not ping DB: %s", err.Error())
 	}
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Could not start sql migration with error msg: %v", err)
+		log.Fatal().Err(err).Msgf("Could not start sql migration with error msg: %s", err.Error())
 		return
 	}
 	m, err := migrate.NewWithDatabaseInstance(
@@ -47,11 +49,11 @@ func InitDB() {
 		driver,
 	)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Migration failed: %v", err)
+		log.Fatal().Err(err).Msgf("Migration failed: %s", err.Error())
 		return
 	}
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal().Err(err).Msgf("An error occurred while syncing the database with error msg: %v", err)
+		log.Fatal().Err(err).Msgf("An error occurred while syncing the database with error msg: %s", err.Error())
 		return
 	}
 	defer db.Close()
@@ -79,473 +81,297 @@ func Ping() (b bool) {
 
 // Create permit to insert data into sql instance
 func Create(d models.Create) (z int64, err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO versions(workload, platform, environment, version, changelog_url, raw, status) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING versions_id")
-	if err != nil && err != sql.ErrNoRows {
+	tx, err := db.Begin(ctx)
+	if err != nil {
 		return
 	}
-	err = stmt.QueryRow(
-		php2go.Addslashes(d.Workload),
-		php2go.Addslashes(d.Platform),
-		php2go.Addslashes(d.Environment),
-		php2go.Addslashes(d.Version),
-		php2go.Addslashes(d.ChangelogURL),
-		php2go.Addslashes(d.Raw),
-		php2go.Addslashes(strings.ToLower(d.Status)),
-	).Scan(&z)
-	if err != nil && err != sql.ErrNoRows {
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
+
+	err = tx.QueryRow(
+		ctx,
+		"INSERT INTO versions(workload, platform, environment, version, changelog_url, raw, status) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING versions_id",
+		d.Workload,
+		d.Platform,
+		d.Environment,
+		d.Version,
+		d.ChangelogURL,
+		d.Raw,
+		strings.ToLower(d.Status),
+	).Scan(
+		&z,
+	)
+	if err = tx.Commit(ctx); err != nil {
 		return
 	}
-	defer stmt.Close()
-	return z, nil
+	return
 }
 
 // UpdateStatus permit to insert data into sql instance
 func UpdateStatus(d models.UpdateStatus) (err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE versions SET status = $1 WHERE versions_id = $2")
-	if err != nil && err != sql.ErrNoRows {
+	tx, err := db.Begin(ctx)
+	if err != nil {
 		return
 	}
-	_, err = stmt.Exec(
-		php2go.Addslashes(strings.ToLower(d.Status)),
+	//golangci-lint fail on this check while the transaction error is checked
+	defer tx.Rollback(ctx) //nolint
+
+	_, err = tx.Exec(
+		ctx,
+		"UPDATE versions SET status = $1 WHERE versions_id = $2",
+		strings.ToLower(d.Status),
 		d.VersionId,
 	)
-	if err != nil && err != sql.ErrNoRows {
-		return err
+	if err = tx.Commit(ctx); err != nil {
+		return
 	}
-	defer stmt.Close()
-	return nil
+	return
 }
 
 // ReadEnvironment permit to get data into sql instance
-func ReadEnvironment(d models.ReadEnvironment) (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+func ReadEnvironment(d models.ReadEnvironment) (z []models.DBReadCommon, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3) total FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3 ORDER BY date DESC OFFSET $4 LIMIT $5")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(d.Workload),
-		php2go.Addslashes(d.Platform),
-		php2go.Addslashes(d.Environment),
+	rows, err := db.Query(
+		ctx,
+		"SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3) total FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3 ORDER BY date DESC OFFSET $4 LIMIT $5",
+		d.Workload,
+		d.Platform,
+		d.Environment,
 		d.StartLimit,
 		d.EndLimit,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
+	defer rows.Close()
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
+		var x models.DBReadCommon
+		if err = rows.Scan(
+			&x.Versions_id,
+			&x.Workload,
+			&x.Platform,
+			&x.Environment,
+			&x.Version,
+			&x.Changelog_url,
+			&x.Raw,
+			&x.Status,
+			&x.Date,
+			&x.Total,
+		); err != nil {
 			return
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
+		z = append(z, x)
 	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // ReadPlatform permit to get data into sql instance
-func ReadPlatform(d models.ReadPlatform) (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+func ReadPlatform(d models.ReadPlatform) (z []models.DBReadCommon, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2) total FROM versions WHERE workload = $1 AND platform = $2 ORDER BY date DESC OFFSET $3 LIMIT $4")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(d.Workload),
-		php2go.Addslashes(d.Platform),
+	rows, err := db.Query(
+		ctx,
+		"SELECT *, (SELECT count(version) FROM versions WHERE workload = $1 AND platform = $2) total FROM versions WHERE workload = $1 AND platform = $2 ORDER BY date DESC OFFSET $3 LIMIT $4",
+		d.Workload,
+		d.Platform,
 		d.StartLimit,
 		d.EndLimit,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
+	defer rows.Close()
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
+		var x models.DBReadCommon
+		if err = rows.Scan(
+			&x.Versions_id,
+			&x.Workload,
+			&x.Platform,
+			&x.Environment,
+			&x.Version,
+			&x.Changelog_url,
+			&x.Raw,
+			&x.Status,
+			&x.Date,
+			&x.Total,
+		); err != nil {
 			return
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
+		z = append(z, x)
 	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // ReadHome permit to get data into sql instance
-func ReadHome() (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+func ReadHome() (z []models.DBCommons, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM versions ORDER BY date DESC LIMIT 25")
-	if err != nil && err != sql.ErrNoRows {
+	rows, err := db.Query(
+		ctx,
+		"SELECT * FROM versions ORDER BY date DESC LIMIT 25",
+	)
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
-	defer stmt.Close()
+	defer rows.Close()
 
-	rows, err := stmt.Query()
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
+		var x models.DBCommons
+		if err = rows.Scan(
+			&x.Versions_id,
+			&x.Workload,
+			&x.Platform,
+			&x.Environment,
+			&x.Version,
+			&x.Changelog_url,
+			&x.Raw,
+			&x.Status,
+			&x.Date,
+		); err != nil {
 			return
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
+		z = append(z, x)
 	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // ReadDistinctWorkloads permit to get data into sql instance
-func ReadDistinctWorkloads() (z []map[string]interface{}, err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+func ReadDistinctWorkloads() (z []models.DBReadDistinctWorkloads, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT DISTINCT workload,platform,environment FROM versions ORDER BY workload,platform,environment ASC")
-	if err != nil && err != sql.ErrNoRows {
+	rows, err := db.Query(
+		ctx,
+		"SELECT DISTINCT workload,platform,environment FROM versions ORDER BY workload,platform,environment ASC",
+	)
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
-	defer stmt.Close()
+	defer rows.Close()
 
-	rows, err := stmt.Query()
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
+		var x models.DBReadDistinctWorkloads
+		if err = rows.Scan(
+			&x.Workload,
+			&x.Platform,
+			&x.Environment,
+		); err != nil {
 			return
 		}
-		var value string
-		sub := make(map[string]interface{})
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			sub[columns[i]] = value
-		}
-		m = append(m, sub)
+		z = append(z, x)
 	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // Raw permit to get data from raw column instance
-func Raw(d models.Raw) (z map[string]interface{}, err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+func Raw(d models.Raw) (z models.DBRaw, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT raw FROM versions WHERE workload = $1 AND environment = $2 AND version = $3 LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
-		php2go.Addslashes(d.Workload),
-		php2go.Addslashes(d.Environment),
-		php2go.Addslashes(d.Version),
+	err = db.QueryRow(
+		ctx,
+		"SELECT raw FROM versions WHERE workload = $1 AND environment = $2 AND version = $3 LIMIT 1",
+		d.Workload,
+		d.Environment,
+		d.Version,
+	).Scan(
+		z.Raw,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make(map[string]interface{}, 0)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
 // RawById permit to get data from raw by version_id column instance
-func RawById(d models.RawById) (z map[string]interface{}, err error) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+func RawById(d models.RawById) (z models.DBCommons, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT * FROM versions WHERE versions_id = $1 LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(
+	err = db.QueryRow(
+		ctx,
+		"SELECT * FROM versions WHERE versions_id = $1 LIMIT 1",
 		d.VersionID,
+	).Scan(
+		&z.Versions_id,
+		&z.Workload,
+		&z.Platform,
+		&z.Environment,
+		&z.Version,
+		&z.Changelog_url,
+		&z.Raw,
+		&z.Status,
+		&z.Date,
 	)
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	m := make(map[string]interface{}, 0)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = php2go.Stripslashes(string(col))
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		return
-	}
-	return m, nil
+	return z, nil
 }
 
-func ReadForUnitTesting() (z map[string]string) {
-	db, err := sql.Open(
-		commons.SqlDriver,
-		commons.BuildDSN(),
-	)
+func ReadForUnitTesting() (z models.DBReadForUnitTesting, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to connect to DB")
 		return
 	}
 	defer db.Close()
 
-	stmt, err := db.Prepare("SELECT versions_id, workload, platform, environment FROM versions LIMIT 1")
-	if err != nil && err != sql.ErrNoRows {
-		log.Error().Err(err).Msgf("Error occured from DB func - Query %v", stmt)
+	err = db.QueryRow(
+		ctx,
+		"SELECT versions_id, workload, platform, environment FROM versions LIMIT 1",
+	).Scan(
+		&z.Versions_id,
+		&z.Workload,
+		&z.Platform,
+		&z.Environment,
+	)
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
 		return
 	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query()
-	if err != nil && err != sql.ErrNoRows {
-		log.Error().Err(err).Msgf("Error occured from DB func - QueryRows %v - stmt %v", rows, stmt)
-		return
-	}
-
-	columns, err := rows.Columns()
-	if err != nil {
-		log.Error().Err(err).Msg("Error occured from DB func")
-		return
-	}
-
-	values := make([]sql.RawBytes, len(columns))
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-	m := make(map[string]string)
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			log.Error().Err(err).Msg("Error occured from DB func")
-			return
-		}
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = string(col)
-			}
-			m[columns[i]] = value
-		}
-	}
-	if err = rows.Err(); err != nil {
-		log.Error().Err(err).Msg("Error occured from DB func")
-		return
-	}
-	return m
+	return z, nil
 }
