@@ -52,7 +52,7 @@ func SetupRouter() *gin.Engine {
 	// disable during unit testing
 	if os.Getenv("APP_PROMETHEUS") != "" {
 		p := ginprometheus.NewPrometheus("http")
-		p.SetListenAddress(":9101")
+		p.SetListenAddressWithRouter(":9101", router)
 		p.Use(router)
 	}
 
