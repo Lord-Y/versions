@@ -215,7 +215,7 @@ jobs:
   build-tags-and-publish-prerelease:
     executor: golang
     environment:
-      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
 
     steps:
     - checkout
@@ -242,7 +242,7 @@ jobs:
   build-tags-and-publish-release:
     executor: golang
     environment:
-      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
 
     steps:
     - checkout

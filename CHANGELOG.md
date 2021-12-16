@@ -14,6 +14,14 @@ Initial release version
 - Fetch data
 - Add git hooks
 
+## [v0.1.0-beta2](https://github.com/Lord-Y/versions-api/releases/tag/v0.1.0-beta2) - 2021-12-16
+
+Initial beta version
+
+### Changed
+
+- Fix docker image format for github release
+
 ## [v0.1.0-beta1](https://github.com/Lord-Y/versions-api/releases/tag/v0.1.0-beta1) - 2021-12-16
 
 Initial beta version
