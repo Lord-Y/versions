@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Lord-Y/versions-api/commons"
+	customLogger "github.com/Lord-Y/versions-api/logger"
 	"github.com/Lord-Y/versions-api/models"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate"
@@ -16,6 +17,10 @@ import (
 	_ "github.com/golang-migrate/migrate/source/file"
 	"github.com/rs/zerolog/log"
 )
+
+func init() {
+	customLogger.SetLoggerLogLevel()
+}
 
 // InitDB permit to initialiaze or migrate databases
 func InitDB() {

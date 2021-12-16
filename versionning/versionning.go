@@ -9,6 +9,7 @@ import (
 
 	"github.com/Lord-Y/versions-api/cache"
 	"github.com/Lord-Y/versions-api/commons"
+	customLogger "github.com/Lord-Y/versions-api/logger"
 	"github.com/Lord-Y/versions-api/models"
 	"github.com/Lord-Y/versions-api/mysql"
 	"github.com/Lord-Y/versions-api/postgres"
@@ -19,6 +20,10 @@ import (
 var (
 	cacheExpire = time.Duration(86400 * 30)
 )
+
+func init() {
+	customLogger.SetLoggerLogLevel()
+}
 
 // Create permit to insert new deployment in DB
 func Create(c *gin.Context) {

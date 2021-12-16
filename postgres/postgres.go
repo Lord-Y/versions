@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Lord-Y/versions-api/commons"
+	customLogger "github.com/Lord-Y/versions-api/logger"
 	"github.com/Lord-Y/versions-api/models"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
@@ -17,6 +18,10 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/rs/zerolog/log"
 )
+
+func init() {
+	customLogger.SetLoggerLogLevel()
+}
 
 // InitDB permit to initialiaze or migrate databases
 func InitDB() {
