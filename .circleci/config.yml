@@ -54,6 +54,10 @@ jobs:
         - /go/pkg/mod
 
     - run:
+        name: Init DB
+        command: go run main.go
+
+    - run:
         name: Perform unit testing
         command: |
           go test -v ./...
@@ -82,7 +86,7 @@ jobs:
     - restore_cache:
         keys:
         - versions-api-postgres-{{ checksum "go.mod" }}
-    
+
     - run:
         name: go mod download
         command: go mod download
@@ -103,6 +107,10 @@ jobs:
         key: versions-api-postgres-{{ checksum "go.mod" }}
         paths:
         - /go/pkg/mod
+
+    - run:
+        name: Init DB
+        command: go run main.go
 
     - run:
         name: Perform unit testing
