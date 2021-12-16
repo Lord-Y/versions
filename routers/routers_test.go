@@ -174,14 +174,16 @@ func TestReadEnvironment_200(t *testing.T) {
 	assert := assert.New(t)
 	router := SetupRouter()
 	if commons.SqlDriver == "mysql" {
-		result, err = mysql.ReadForUnitTesting()
+		result, err = mysql.ReadForUnitTesting("deployed")
 		if err != nil {
+			log.Error().Msg("Result from DB is empty")
 			t.Fail()
 			return
 		}
 	} else {
-		result, err = postgres.ReadForUnitTesting()
+		result, err = postgres.ReadForUnitTesting("deployed")
 		if err != nil {
+			log.Error().Msg("Result from DB is empty")
 			t.Fail()
 			return
 		}
@@ -197,9 +199,6 @@ func TestReadEnvironment_200(t *testing.T) {
 		assert.Equal(200, w.Code, "Fail to get expected status code")
 		assert.Contains(w.Body.String(), "workload", "Fail to get expected content")
 
-	} else {
-		log.Error().Msg("Error occured while getting data for unit testing from DB")
-		t.Fail()
 	}
 }
 
@@ -233,6 +232,95 @@ func TestReadEnvironment_404(t *testing.T) {
 	assert.Equal(404, w.Code, "Fail to get expected status code")
 }
 
+func TestReadEnvironmentLatest_200(t *testing.T) {
+	var (
+		headers map[string]string
+		result  models.DBReadForUnitTesting
+		err     error
+	)
+	assert := assert.New(t)
+	router := SetupRouter()
+	if commons.SqlDriver == "mysql" {
+		result, err = mysql.ReadForUnitTesting("deployed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	} else {
+		result, err = postgres.ReadForUnitTesting("deployed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	}
+	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+		url := fmt.Sprintf("/api/v1/versions/read/environment/latest?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
+		w, err := performRequest(router, headers, "GET", url, "")
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing http request")
+			t.Fail()
+			return
+		}
+		assert.Equal(200, w.Code, "Fail to get expected status code")
+		assert.Contains(w.Body.String(), "version", "Fail to get expected content")
+
+	}
+}
+
+func TestReadEnvironmentLatestWhatever_200(t *testing.T) {
+	var (
+		headers map[string]string
+		result  models.DBReadForUnitTesting
+		err     error
+	)
+	assert := assert.New(t)
+	router := SetupRouter()
+	if commons.SqlDriver == "mysql" {
+		result, err = mysql.ReadForUnitTesting("failed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	} else {
+		result, err = postgres.ReadForUnitTesting("failed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	}
+	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+		url := fmt.Sprintf("/api/v1/versions/read/environment/latest/whatever?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
+		w, err := performRequest(router, headers, "GET", url, "")
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing http request")
+			t.Fail()
+			return
+		}
+		assert.Equal(200, w.Code, "Fail to get expected status code")
+		assert.Contains(w.Body.String(), "version", "Fail to get expected content")
+
+	}
+}
+
+func TestReadEnvironmentLatest_404(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/environment?workload=plop&platform=platform&environment=environment", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Equal(404, w.Code, "Fail to get expected status code")
+}
+
 func TestReadPlatform_200(t *testing.T) {
 	headers := make(map[string]string)
 	var (
@@ -243,14 +331,16 @@ func TestReadPlatform_200(t *testing.T) {
 	assert := assert.New(t)
 	router := SetupRouter()
 	if commons.SqlDriver == "mysql" {
-		result, err = mysql.ReadForUnitTesting()
+		result, err = mysql.ReadForUnitTesting("deployed")
 		if err != nil {
+			log.Error().Msg("Result from DB is empty")
 			t.Fail()
 			return
 		}
 	} else {
-		result, err = postgres.ReadForUnitTesting()
+		result, err = postgres.ReadForUnitTesting("deployed")
 		if err != nil {
+			log.Error().Msg("Result from DB is empty")
 			t.Fail()
 			return
 		}
@@ -266,9 +356,6 @@ func TestReadPlatform_200(t *testing.T) {
 		assert.Equal(200, w.Code, "Fail to get expected status code")
 		assert.Contains(w.Body.String(), "workload", "Fail to get expected content")
 
-	} else {
-		log.Error().Msg("Error occured while getting data for unit testing from DB")
-		t.Fail()
 	}
 }
 

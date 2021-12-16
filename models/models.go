@@ -54,6 +54,14 @@ type RawById struct {
 	VersionID int `form:"versionId" json:"versionId" binding:"required"`
 }
 
+// ReadEnvironmentLatest struct
+type ReadEnvironmentLatest struct {
+	Workload    string `form:"workload" json:"workload" binding:"required,max=100"`
+	Platform    string `form:"platform" json:"platform" binding:"required,max=100"`
+	Environment string `form:"environment" json:"environment" binding:"required,max=100"`
+	Whatever    bool
+}
+
 // DBReadCommon
 type DBReadCommon struct {
 	Versions_id   int       `json:"versions_id"`
@@ -99,4 +107,9 @@ type DBReadForUnitTesting struct {
 	Workload    string `json:"workload"`
 	Platform    string `json:"platform"`
 	Environment string `json:"environment"`
+}
+
+// DbVersion struct
+type DbVersion struct {
+	Version string `json:"version"`
 }

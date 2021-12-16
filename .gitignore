@@ -30,3 +30,4 @@ _testmain.go
 /misc/cgo/testso/main
 /pkg/*.*
 /src/go.sum
+**/coverage.out

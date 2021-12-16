@@ -191,6 +191,37 @@ func ReadEnvironment(d models.ReadEnvironment) (z []models.DBReadCommon, err err
 	return z, nil
 }
 
+// ReadEnvironmentLatest permit to get latest version with status deployed or completed
+func ReadEnvironmentLatest(d models.ReadEnvironmentLatest) (z models.DbVersion, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	var query string
+	if d.Whatever {
+		query = "SELECT version FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3 ORDER BY date DESC LIMIT 1"
+	} else {
+		query = "SELECT version FROM versions WHERE workload = $1 AND platform = $2 AND environment = $3 AND status IN ('completed', 'deployed') ORDER BY date DESC LIMIT 1"
+	}
+
+	err = db.QueryRow(
+		ctx,
+		query,
+		d.Workload,
+		d.Platform,
+		d.Environment,
+	).Scan(
+		&z.Version,
+	)
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
+		return
+	}
+	return z, nil
+}
+
 // ReadPlatform permit to get data into sql instance
 func ReadPlatform(d models.ReadPlatform) (z []models.DBReadCommon, err error) {
 	ctx := context.Background()
@@ -358,7 +389,7 @@ func RawById(d models.RawById) (z models.DBCommons, err error) {
 	return z, nil
 }
 
-func ReadForUnitTesting() (z models.DBReadForUnitTesting, err error) {
+func ReadForUnitTesting(status string) (z models.DBReadForUnitTesting, err error) {
 	ctx := context.Background()
 	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
 	if err != nil {
@@ -368,7 +399,8 @@ func ReadForUnitTesting() (z models.DBReadForUnitTesting, err error) {
 
 	err = db.QueryRow(
 		ctx,
-		"SELECT versions_id, workload, platform, environment FROM versions LIMIT 1",
+		"SELECT versions_id, workload, platform, environment FROM versions WHERE status = $1 LIMIT 1",
+		status,
 	).Scan(
 		&z.Versions_id,
 		&z.Workload,

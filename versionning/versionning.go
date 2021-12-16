@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Lord-Y/versions-api/cache"
@@ -49,7 +50,6 @@ func Create(c *gin.Context) {
 	} else {
 		result, err = postgres.Create(d)
 	}
-	log.Info().Msgf("result %v", result)
 
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing db query")
@@ -164,6 +164,40 @@ func ReadEnvironment(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusOK, result)
 		}
+	}
+}
+
+// ReadEnvironment permit to get last deployment in DB
+func ReadEnvironmentLatest(c *gin.Context) {
+	var (
+		d   models.ReadEnvironmentLatest
+		err error
+	)
+
+	if err = c.ShouldBind(&d); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if strings.Contains(c.Request.URL.Path, "/api/v1/versions/read/environment/latest/whatever") {
+		d.Whatever = true
+	}
+
+	var result models.DbVersion
+	if commons.SqlDriver == "mysql" {
+		result, err = mysql.ReadEnvironmentLatest(d)
+	} else {
+		result, err = postgres.ReadEnvironmentLatest(d)
+	}
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing db query")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	if result == (models.DbVersion{}) {
+		c.AbortWithStatus(404)
+	} else {
+		c.JSON(http.StatusOK, result)
 	}
 }
 

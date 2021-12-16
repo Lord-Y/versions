@@ -43,7 +43,9 @@ export APP_PORT=8080
 Unit testing are covered.
 
 ```bash
-go test -v
+go test -v ./... -coverprofile=coverage.out
+# go tool cover -html=coverage.out
+# go tool cover -func=coverage.out
 ```
 
 ## Queries
@@ -102,3 +104,18 @@ Here is an example of DB content:
 |          14 | teamZ    | preproduction | preproduction | 1.1.0   | https://jsonplaceholder.typicode.com/ | {\"a\":\"b\"} | deployed | 2020-12-02 19:58:11 |
 +-------------+----------+---------------+---------------+---------+---------------------------------------+---------------+----------+---------------------+
 ```
+
+## Get latest deployment
+
+Sometimes, you may need to fetch dynamically latest deployment.
+You can fetch it like so:
+```bash
+curl -XPOST 0:8080/api/v1/versions/read/environment/latest?workload=teamX&environment=production&platform=production'
+```
+It will query latest version with `status` equal to `deployed` or `completed`.
+
+You can also use:
+```bash
+curl -XPOST 0:8080/api/v1/versions/read/environment/latest/whatever?workload=teamX&environment=production&platform=production'
+```
+It will fetch the latest version deployed without checking the `status` of the deployment.

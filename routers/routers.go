@@ -71,6 +71,8 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/read/distinct/workloads", versionning.ReadDistinctWorkloads)
 		v1.GET("/read/raw", versionning.Raw)
 		v1.GET("/read/raw/id", versionning.RawById)
+		v1.GET("/read/environment/latest", versionning.ReadEnvironmentLatest)
+		v1.GET("/read/environment/latest/whatever", versionning.ReadEnvironmentLatest)
 	}
 	return router
 }

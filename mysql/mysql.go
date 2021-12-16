@@ -196,6 +196,40 @@ func ReadEnvironment(d models.ReadEnvironment) (z []models.DBReadCommon, err err
 	return z, nil
 }
 
+// ReadEnvironmentLatest permit to get latest version with status deployed or completed
+func ReadEnvironmentLatest(d models.ReadEnvironmentLatest) (z models.DbVersion, err error) {
+	ctx := context.Background()
+	db, err := sql.Open(
+		commons.SqlDriver,
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	var query string
+	if d.Whatever {
+		query = "SELECT version FROM versions WHERE workload = ? AND platform = ? AND environment = ? ORDER BY date DESC LIMIT 1"
+	} else {
+		query = "SELECT version FROM versions WHERE workload = ? AND platform = ? AND environment = ? AND status IN ('completed', 'deployed') ORDER BY date DESC LIMIT 1"
+	}
+
+	err = db.QueryRowContext(
+		ctx,
+		query,
+		d.Workload,
+		d.Platform,
+		d.Environment,
+	).Scan(
+		&z.Version,
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	return z, nil
+}
+
 // ReadPlatform permit to get data into sql instance
 func ReadPlatform(d models.ReadPlatform) (z []models.DBReadCommon, err error) {
 	db, err := sql.Open(
@@ -348,7 +382,7 @@ func Raw(d models.Raw) (z models.DBRaw, err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
-	return
+	return z, nil
 }
 
 // RawById permit to get data from raw by version_id column instance
@@ -381,10 +415,10 @@ func RawById(d models.RawById) (z models.DBCommons, err error) {
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
-	return
+	return z, nil
 }
 
-func ReadForUnitTesting() (z models.DBReadForUnitTesting, err error) {
+func ReadForUnitTesting(status string) (z models.DBReadForUnitTesting, err error) {
 	ctx := context.Background()
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -397,7 +431,8 @@ func ReadForUnitTesting() (z models.DBReadForUnitTesting, err error) {
 
 	err = db.QueryRowContext(
 		ctx,
-		"SELECT versions_id, workload, platform, environment FROM versions LIMIT 1",
+		"SELECT versions_id, workload, platform, environment FROM versions WHERE status = ? LIMIT 1",
+		status,
 	).Scan(
 		&z.Versions_id,
 		&z.Workload,
