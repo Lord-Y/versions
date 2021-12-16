@@ -1,12 +1,18 @@
+# versions-api [![CircleCI](https://circleci.com/gh/Lord-Y/versions-api/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/versions-api?branch=main)
+
 # versions-api
 
 This api permit to centralize all your applications versions deployed in order to know when it has been deployed and his content.
 
+You can visualize your deployments on the [UI](https://github.com/Lord-Y/versions).
+
 ## Definitions
 
-Workload: it mean which team is related to this deployment
-Platform: release to which platform your application has been deployed like development, staging, preproduction or production
-Environment: on each platform, multiple environment can be deployed like development or integration
+`Workload`: it mean which team is related to this deployment
+
+`Platform`: release to which platform your application has been deployed like development, staging, preproduction or production
+
+`Environment`: on each platform, multiple environment can be deployed like development or integration
 
 ## How it works
 
