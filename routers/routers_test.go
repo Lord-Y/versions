@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -94,6 +95,25 @@ func TestHealthz(t *testing.T) {
 
 	assert.Contains(w.Body.String(), "status", "Fail to get /healthz body")
 	assert.Equal(200, w.Code, "Fail to get /healthz")
+}
+
+func TestHealth_prometheus(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+
+	os.Setenv("APP_PROMETHEUS", "1")
+	defer os.Unsetenv("APP_PROMETHEUS")
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/health", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+
+	assert.Contains(w.Body.String(), "OK", "Fail to get /health body")
+	assert.Equal(200, w.Code, "Fail to get /health")
 }
 
 func createFakeVerion() (s string) {
