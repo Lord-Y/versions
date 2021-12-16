@@ -55,7 +55,10 @@ jobs:
 
     - run:
         name: Init DB
-        command: go run main.go
+        command: |
+          go run main.go
+          sleep 15
+          pgrep main |xargs -n1 -P1 kill
 
     - run:
         name: Perform unit testing
@@ -110,7 +113,10 @@ jobs:
 
     - run:
         name: Init DB
-        command: go run main.go
+        command: |
+          go run main.go
+          sleep 15
+          pgrep main |xargs -n1 -P1 kill
 
     - run:
         name: Perform unit testing
