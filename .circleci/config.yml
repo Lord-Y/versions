@@ -56,8 +56,8 @@ jobs:
     - run:
         name: Init DB
         command: |
-          go run main.go
-          sleep 15
+          go run main.go &
+          sleep 10
           pgrep main |xargs -n1 -P1 kill
 
     - run:
@@ -114,8 +114,8 @@ jobs:
     - run:
         name: Init DB
         command: |
-          go run main.go
-          sleep 15
+          go run main.go &
+          sleep 10
           pgrep main |xargs -n1 -P1 kill
 
     - run:
