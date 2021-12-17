@@ -8,11 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This version is all about metrics deployment in order to make dashbords on the [UI](https://github.com/Lord-Y/versions) or to use them in Grafana.
 
-### Changed
-- Update default golang version in Dockerfile
-
 ### Added
 - Add last 10 days deployments endpoint and the prometheus equivalent
+
+### Changed
+- Update default golang version in Dockerfile
+- Update CI requirements
+
+## [v0.2.0-beta3](https://github.com/Lord-Y/versions-api/releases/tag/v0.2.0-beta3) - 2021-12-17
+
+This version is all about metrics deployment in order to make dashbords on the [UI](https://github.com/Lord-Y/versions) or to use them in Grafana.
+
+### Changed
+- Update default golang version in Dockerfile
+- Update CI requirements
 
 ## [v0.2.0-beta2](https://github.com/Lord-Y/versions-api/releases/tag/v0.2.0-beta2) - 2021-12-17
 
