@@ -126,6 +126,12 @@ curl '0:8080/api/v1/versions/read/environment/latest/whatever?workload=teamX&env
 ```
 It will fetch the latest version deployed without checking the `status` of the deployment.
 
+## Metrics
+
+Golang metrics are built-in in our API.
+
+We also add last 10 days deployments by status on `curl 0:8080/api/v1/versions/stats/latest` but also on `curl 0:9101/metrics |grep versions_last_deployments_by_status`
+
 ## Contributing
 
 In order to contribute to our project, we need to configure git hooks.
