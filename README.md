@@ -116,13 +116,13 @@ Here is an example of DB content:
 Sometimes, you may need to fetch dynamically latest deployment.
 You can fetch it like so:
 ```bash
-curl -XPOST 0:8080/api/v1/versions/read/environment/latest?workload=teamX&environment=production&platform=production'
+curl '0:8080/api/v1/versions/read/environment/latest?workload=teamX&environment=production&platform=production'
 ```
 It will query latest version with `status` equal to `deployed` or `completed`.
 
 You can also use:
 ```bash
-curl -XPOST 0:8080/api/v1/versions/read/environment/latest/whatever?workload=teamX&environment=production&platform=production'
+curl '0:8080/api/v1/versions/read/environment/latest/whatever?workload=teamX&environment=production&platform=production'
 ```
 It will fetch the latest version deployed without checking the `status` of the deployment.
 

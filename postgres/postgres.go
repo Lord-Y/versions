@@ -412,3 +412,38 @@ func ReadForUnitTesting(status string) (z models.DBReadForUnitTesting, err error
 	}
 	return z, nil
 }
+
+// GetLastXDaysDeployments permit to get data into sql instance
+func GetLastXDaysDeployments() (z []models.DBGetLastXDaysDeployments, err error) {
+	ctx := context.Background()
+	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	rows, err := db.Query(
+		ctx,
+		"SELECT COUNT(versions_id) total,workload,platform,environment,status,TO_DATE(to_char(date,'YYYY-MM-DD'),'YYYY-MM-DD') date FROM versions WHERE TO_DATE(to_char(date,'YYYY-MM-DD'),'YYYY-MM-DD') >= (NOW() - INTERVAL '10 DAY') GROUP BY status,workload,platform,environment,TO_DATE(to_char(date,'YYYY-MM-DD'),'YYYY-MM-DD')",
+	)
+	if err != nil && err.Error() != pgx.ErrNoRows.Error() {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var x models.DBGetLastXDaysDeployments
+		if err = rows.Scan(
+			&x.Total,
+			&x.Workload,
+			&x.Platform,
+			&x.Environment,
+			&x.Status,
+			&x.Date,
+		); err != nil {
+			return
+		}
+		z = append(z, x)
+	}
+	return z, nil
+}

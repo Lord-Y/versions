@@ -543,3 +543,67 @@ func RawById(c *gin.Context) {
 		}
 	}
 }
+
+// GetLastXDaysDeployments permit to get last X deployment in DB
+func GetLastXDaysDeployments(c *gin.Context) {
+	var err error
+
+	if commons.RedisEnabled() {
+		keyName := fmt.Sprintf("w_p_metrics_%x", commons.GetMD5HashWithSum("metrics"))
+		result, err := cache.RedisGet(commons.GetRedisURI(), keyName)
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while retrieving data from cache")
+		}
+		if len(result) > 0 {
+			var a []models.DBGetLastXDaysDeployments
+			err = json.Unmarshal([]byte(result), &a)
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while unmarshalling data")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				return
+			}
+			c.JSON(http.StatusOK, a)
+		} else {
+			var result []models.DBGetLastXDaysDeployments
+			if commons.SqlDriver == "mysql" {
+				result, err = mysql.GetLastXDaysDeployments()
+			} else {
+				result, err = postgres.GetLastXDaysDeployments()
+			}
+			if err != nil {
+				log.Error().Err(err).Msg("Error occured while performing db query")
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				return
+			}
+			if len(result) == 0 {
+				c.AbortWithStatus(204)
+			} else {
+				b, err := json.Marshal(result)
+				if err != nil {
+					log.Error().Err(err).Msg("Error occured while marshalling data")
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				} else {
+					cache.RedisSet(commons.GetRedisURI(), keyName, string(b), cacheExpire)
+					c.JSON(http.StatusOK, result)
+				}
+			}
+		}
+	} else {
+		var result []models.DBGetLastXDaysDeployments
+		if commons.SqlDriver == "mysql" {
+			result, err = mysql.GetLastXDaysDeployments()
+		} else {
+			result, err = postgres.GetLastXDaysDeployments()
+		}
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing db query")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+		if len(result) == 0 {
+			c.AbortWithStatus(204)
+		} else {
+			c.JSON(http.StatusOK, result)
+		}
+	}
+}

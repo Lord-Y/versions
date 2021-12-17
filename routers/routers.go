@@ -7,10 +7,12 @@ import (
 
 	"github.com/Lord-Y/versions-api/health"
 	customLogger "github.com/Lord-Y/versions-api/logger"
+	"github.com/Lord-Y/versions-api/metrics"
 	"github.com/Lord-Y/versions-api/versionning"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 	ginprometheus "github.com/mcuadros/go-gin-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -73,6 +75,9 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/read/raw/id", versionning.RawById)
 		v1.GET("/read/environment/latest", versionning.ReadEnvironmentLatest)
 		v1.GET("/read/environment/latest/whatever", versionning.ReadEnvironmentLatest)
+		v1.GET("/stats/latest", versionning.GetLastXDaysDeployments)
 	}
+
+	prometheus.MustRegister(metrics.LastDeployments())
 	return router
 }

@@ -113,3 +113,13 @@ type DBReadForUnitTesting struct {
 type DbVersion struct {
 	Version string `json:"version"`
 }
+
+// DBGetLastXDaysDeployments
+type DBGetLastXDaysDeployments struct {
+	Total       int64     `json:"total"`
+	Workload    string    `json:"workload"`
+	Platform    string    `json:"platform"`
+	Environment string    `json:"environment"`
+	Status      string    `json:"status"`
+	Date        time.Time `json:"date"` // using string because time.Time doesn't work with mysql DATE_FORMAT
+}

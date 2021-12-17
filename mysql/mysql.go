@@ -444,3 +444,56 @@ func ReadForUnitTesting(status string) (z models.DBReadForUnitTesting, err error
 	}
 	return z, nil
 }
+
+// GetLastXDaysDeployments permit to get data into sql instance
+func GetLastXDaysDeployments() (z []models.DBGetLastXDaysDeployments, err error) {
+	db, err := sql.Open(
+		commons.SqlDriver,
+		commons.BuildDSN(),
+	)
+	if err != nil {
+		return
+	}
+	defer db.Close()
+
+	// SELECT COUNT(versions_id) total,workload,platform,environment,status,DATE_FORMAT(date,'%Y-%m-%d 00:00:00') date FROM versions WHERE DATE_FORMAT(date,'%Y-%m-%d 00:00:00') >= (DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00') - INTERVAL 7 DAY) GROUP BY status,workload,platform,environment,date;
+	// I cannot use previous query as go will throw on error while parsing sql date_format
+	// and using a golang function with time.Parse is not helping either
+	stmt, err := db.Prepare("SELECT COUNT(versions_id) total,workload,platform,environment,status,date FROM versions WHERE DATE_FORMAT(date,'%Y-%m-%d') >= (DATE_FORMAT(NOW(),'%Y-%m-%d') - INTERVAL 10 DAY) GROUP BY status,workload,platform,environment,date")
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil && err != sql.ErrNoRows {
+		return
+	}
+
+	for rows.Next() {
+		var x models.DBGetLastXDaysDeployments
+		if err = rows.Scan(
+			&x.Total,
+			&x.Workload,
+			&x.Platform,
+			&x.Environment,
+			&x.Status,
+			&x.Date,
+		); err != nil {
+			return
+		}
+		z = append(z, x)
+	}
+	return z, nil
+}
+
+// func df(d time.Time) *time.Time {
+// 	strDate := time.Time(time.Unix(int64(d.Unix()), 0)).Format("2021-12-16")
+// 	log.Info().Msgf("dateeeeeeeeee %s strdate %s", d, strDate)
+// 	layout := "2021-12-16"
+// 	t, err := time.Parse(layout, strDate)
+// 	if err != nil {
+// 		log.Error().Err(err).Msg("fuck")
+// 	}
+// 	return &t
+// }
