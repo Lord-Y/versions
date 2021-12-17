@@ -10,6 +10,18 @@ This version is all about metrics deployment in order to make dashbords on the [
 
 ### Added
 - Add last 10 days deployments endpoint and the prometheus equivalent
+- Add more unit testing
+
+### Changed
+- Update default golang version in Dockerfile
+- Update CI requirements
+
+## [v0.2.0-beta4](https://github.com/Lord-Y/versions-api/releases/tag/v0.2.0-beta4) - 2021-12-17
+
+This version is all about metrics deployment in order to make dashbords on the [UI](https://github.com/Lord-Y/versions) or to use them in Grafana.
+
+### Added
+- Add more unit testing
 
 ### Changed
 - Update default golang version in Dockerfile
