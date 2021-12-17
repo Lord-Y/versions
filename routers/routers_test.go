@@ -187,7 +187,7 @@ func TestCreate(t *testing.T) {
 func TestReadEnvironment_200(t *testing.T) {
 	headers := make(map[string]string)
 	var (
-		result models.DBReadForUnitTesting
+		result models.DBCommons
 		err    error
 	)
 
@@ -208,7 +208,7 @@ func TestReadEnvironment_200(t *testing.T) {
 			return
 		}
 	}
-	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
 		url := fmt.Sprintf("/api/v1/versions/read/environment?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
@@ -255,7 +255,7 @@ func TestReadEnvironment_404(t *testing.T) {
 func TestReadEnvironmentLatest_200(t *testing.T) {
 	var (
 		headers map[string]string
-		result  models.DBReadForUnitTesting
+		result  models.DBCommons
 		err     error
 	)
 	assert := assert.New(t)
@@ -275,7 +275,7 @@ func TestReadEnvironmentLatest_200(t *testing.T) {
 			return
 		}
 	}
-	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
 		url := fmt.Sprintf("/api/v1/versions/read/environment/latest?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
@@ -292,7 +292,7 @@ func TestReadEnvironmentLatest_200(t *testing.T) {
 func TestReadEnvironmentLatestWhatever_200(t *testing.T) {
 	var (
 		headers map[string]string
-		result  models.DBReadForUnitTesting
+		result  models.DBCommons
 		err     error
 	)
 	assert := assert.New(t)
@@ -312,7 +312,7 @@ func TestReadEnvironmentLatestWhatever_200(t *testing.T) {
 			return
 		}
 	}
-	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
 		url := fmt.Sprintf("/api/v1/versions/read/environment/latest/whatever?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
@@ -344,7 +344,7 @@ func TestReadEnvironmentLatest_404(t *testing.T) {
 func TestReadPlatform_200(t *testing.T) {
 	headers := make(map[string]string)
 	var (
-		result models.DBReadForUnitTesting
+		result models.DBCommons
 		err    error
 	)
 
@@ -365,7 +365,7 @@ func TestReadPlatform_200(t *testing.T) {
 			return
 		}
 	}
-	if result != (models.DBReadForUnitTesting{}) && result.Workload != "" && result.Platform != "" {
+	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
 		url := fmt.Sprintf("/api/v1/versions/read/platform?workload=%s&platform=%s", result.Workload, result.Platform)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
@@ -422,4 +422,92 @@ func TestReadDistinctWorkloads(t *testing.T) {
 	}
 	assert.Equal(200, w.Code, "Fail to get expected status code")
 	assert.Contains(w.Body.String(), "workload", "Fail to get expected content")
+}
+
+func TestReadRaw_200(t *testing.T) {
+	headers := make(map[string]string)
+	var (
+		result models.DBCommons
+		err    error
+	)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	if commons.SqlDriver == "mysql" {
+		result, err = mysql.ReadForUnitTesting("deployed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	} else {
+		result, err = postgres.ReadForUnitTesting("deployed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	}
+	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
+		url := fmt.Sprintf("/api/v1/versions/read/raw?workload=%s&platform=%s&environment=%s&version=%s", result.Workload, result.Platform, result.Environment, result.Version)
+		w, err := performRequest(router, headers, "GET", url, "")
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing http request")
+			t.Fail()
+			return
+		}
+		assert.Equal(200, w.Code, "Fail to get expected status code")
+
+	}
+}
+
+func TestReadRawID_200(t *testing.T) {
+	headers := make(map[string]string)
+	var (
+		result models.DBCommons
+		err    error
+	)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	if commons.SqlDriver == "mysql" {
+		result, err = mysql.ReadForUnitTesting("deployed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	} else {
+		result, err = postgres.ReadForUnitTesting("deployed")
+		if err != nil {
+			log.Error().Msg("Result from DB is empty")
+			t.Fail()
+			return
+		}
+	}
+	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
+		url := fmt.Sprintf("/api/v1/versions/read/raw/id?versionId=%d", result.Versions_id)
+		w, err := performRequest(router, headers, "GET", url, "")
+		if err != nil {
+			log.Error().Err(err).Msg("Error occured while performing http request")
+			t.Fail()
+			return
+		}
+		assert.Equal(200, w.Code, "Fail to get expected status code")
+
+	}
+}
+
+func TestStatsLatest_200(t *testing.T) {
+	headers := make(map[string]string)
+
+	assert := assert.New(t)
+	router := SetupRouter()
+	w, err := performRequest(router, headers, "GET", "/api/v1/versions/stats/latest", "")
+	if err != nil {
+		log.Error().Err(err).Msg("Error occured while performing http request")
+		t.Fail()
+		return
+	}
+	assert.Equal(200, w.Code, "Fail to get expected status code")
 }
