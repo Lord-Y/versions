@@ -1,7 +1,7 @@
 ############################
 # STEP 1 build executable binary
 ############################
-ARG DOCKER_IMAGE_GOLANG="mirror.gcr.io/library/golang:1.15-alpine"
+ARG DOCKER_IMAGE_GOLANG="mirror.gcr.io/library/golang:1.17-alpine"
 FROM ${DOCKER_IMAGE_GOLANG} as builder
 # Install git + SSL ca certificates.
 # Git is required for fetching the dependencies.
