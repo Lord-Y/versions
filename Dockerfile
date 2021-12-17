@@ -15,6 +15,7 @@ RUN rm -rf $GOPATH/pkg/* $GOPATH/src/go.sum $GOPATH/.git /var/cache/apk/*
 ENV GOBIN=$GOPATH/bin
 ENV PATH=$GOBIN:$PATH
 ENV GO111MODULE=on
+RUN go env -w GOFLAGS=-mod=mod
 # Fetch dependencies.
 # Using go mod with go >= 1.11
 RUN go mod download
