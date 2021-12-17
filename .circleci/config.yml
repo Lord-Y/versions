@@ -181,7 +181,6 @@ jobs:
         command: |
           echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
-          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
 
     - run:
         name: Deploy tagged build
@@ -197,6 +196,7 @@ jobs:
     - run:
         name: Publish prerelease
         command: |
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
           go get github.com/github-release/github-release
           git checkout .
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions-api/blob/main/CHANGELOG.md)" -p
