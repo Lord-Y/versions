@@ -121,5 +121,5 @@ type DBGetLastXDaysDeployments struct {
 	Platform    string    `json:"platform"`
 	Environment string    `json:"environment"`
 	Status      string    `json:"status"`
-	Date        time.Time `json:"date"` // using string because time.Time doesn't work with mysql DATE_FORMAT
+	Date        time.Time `json:"date"`
 }
