@@ -101,14 +101,6 @@ type DBRaw struct {
 	Raw string `json:"raw"`
 }
 
-// DBReadForUnitTesting
-type DBReadForUnitTesting struct {
-	Versions_id int    `json:"versions_id"`
-	Workload    string `json:"workload"`
-	Platform    string `json:"platform"`
-	Environment string `json:"environment"`
-}
-
 // DbVersion struct
 type DbVersion struct {
 	Version string `json:"version"`

@@ -377,7 +377,7 @@ func Raw(d models.Raw) (z models.DBRaw, err error) {
 		d.Environment,
 		d.Version,
 	).Scan(
-		z.Raw,
+		&z.Raw,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return
@@ -418,7 +418,7 @@ func RawById(d models.RawById) (z models.DBCommons, err error) {
 	return z, nil
 }
 
-func ReadForUnitTesting(status string) (z models.DBReadForUnitTesting, err error) {
+func ReadForUnitTesting(status string) (z models.DBCommons, err error) {
 	ctx := context.Background()
 	db, err := sql.Open(
 		commons.SqlDriver,
@@ -431,13 +431,18 @@ func ReadForUnitTesting(status string) (z models.DBReadForUnitTesting, err error
 
 	err = db.QueryRowContext(
 		ctx,
-		"SELECT versions_id, workload, platform, environment FROM versions WHERE status = ? LIMIT 1",
+		"SELECT * FROM versions WHERE status = ? LIMIT 1",
 		status,
 	).Scan(
 		&z.Versions_id,
 		&z.Workload,
 		&z.Platform,
 		&z.Environment,
+		&z.Version,
+		&z.Changelog_url,
+		&z.Raw,
+		&z.Status,
+		&z.Date,
 	)
 	if err != nil && err != sql.ErrNoRows {
 		return
