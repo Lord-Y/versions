@@ -56,6 +56,7 @@ func SetupRouter() *gin.Engine {
 		p := ginprometheus.NewPrometheus("http")
 		p.SetListenAddressWithRouter(":9101", router)
 		p.Use(router)
+		prometheus.MustRegister(metrics.LastDeployments())
 	}
 
 	v1 := router.Group("/api/v1/versions")
@@ -78,6 +79,5 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/stats/latest", versionning.GetLastXDaysDeployments)
 	}
 
-	prometheus.MustRegister(metrics.LastDeployments())
 	return router
 }
