@@ -11,22 +11,14 @@ export default {
       './configs/runtimeConfigServer',
       {
         publicConfig: {
-          BASE_URL: process.env.BASE_URL
-            ? process.env.BASE_URL
-            : 'http://localhost:8080',
-          API_URL: process.env.API_URL
-            ? process.env.API_URL
-            : 'http://localhost:8081',
-          RANGE_LIMIT: process.env.RANGE_LIMIT ? process.env.RANGE_LIMIT : 25,
+          BASE_URL: process.env.BASE_URL || 'http://localhost:8080',
+          API_URL: process.env.API_URL || 'http://localhost:8081',
+          RANGE_LIMIT: process.env.RANGE_LIMIT || 25,
         },
         privateConfig: {
-          BASE_URL: process.env.BASE_URL
-            ? process.env.BASE_URL
-            : 'http://localhost:8080',
-          API_URL: process.env.API_URL
-            ? process.env.API_URL
-            : 'http://localhost:8081',
-          RANGE_LIMIT: process.env.RANGE_LIMIT ? process.env.RANGE_LIMIT : 25,
+          BASE_URL: process.env.BASE_URL || 'http://localhost:8080',
+          API_URL: process.env.API_URL || 'http://localhost:8081',
+          RANGE_LIMIT: process.env.RANGE_LIMIT || 25,
         },
       },
     ],
