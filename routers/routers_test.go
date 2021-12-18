@@ -196,14 +196,14 @@ func TestReadEnvironment_200(t *testing.T) {
 	if commons.SqlDriver == "mysql" {
 		result, err = mysql.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
 	} else {
 		result, err = postgres.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
@@ -263,14 +263,14 @@ func TestReadEnvironmentLatest_200(t *testing.T) {
 	if commons.SqlDriver == "mysql" {
 		result, err = mysql.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
 	} else {
 		result, err = postgres.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
@@ -300,14 +300,14 @@ func TestReadEnvironmentLatestWhatever_200(t *testing.T) {
 	if commons.SqlDriver == "mysql" {
 		result, err = mysql.ReadForUnitTesting("failed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
 	} else {
 		result, err = postgres.ReadForUnitTesting("failed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
@@ -353,14 +353,14 @@ func TestReadPlatform_200(t *testing.T) {
 	if commons.SqlDriver == "mysql" {
 		result, err = mysql.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
 	} else {
 		result, err = postgres.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
@@ -436,14 +436,14 @@ func TestReadRaw_200(t *testing.T) {
 	if commons.SqlDriver == "mysql" {
 		result, err = mysql.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
 	} else {
 		result, err = postgres.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
@@ -473,14 +473,14 @@ func TestReadRawID_200(t *testing.T) {
 	if commons.SqlDriver == "mysql" {
 		result, err = mysql.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
 	} else {
 		result, err = postgres.ReadForUnitTesting("deployed")
 		if err != nil {
-			log.Error().Msg("Result from DB is empty")
+			log.Error().Err(err).Msg("Error occured while fetching data from DB")
 			t.Fail()
 			return
 		}
