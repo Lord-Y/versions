@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb:10.7
+    container_name: mariadb-10.7
+    environment:
+    - MYSQL_DATABASE=versions
+    - MYSQL_USER=versions
+    - MYSQL_PASSWORD=versions
+    - MYSQL_ROOT_PASSWORD=versions
+    ports:
+    - 3306:3306
+    volumes:
+    - /var/lib/mysql
+  postgres:
+    image: postgres:14
+    container_name: postgres-14
+    environment:
+    - POSTGRES_DB=versions
+    - POSTGRES_USER=versions
+    - POSTGRES_PASSWORD=versions
+    ports:
+    - 5432:5432
+    volumes:
+    - /var/lib/postgresql

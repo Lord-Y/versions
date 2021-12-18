@@ -1,0 +1,265 @@
+---
+version: 2.1
+
+executors:
+  golang:
+    machine:
+      image: ubuntu-2004:202104-01
+
+jobs:
+  mariadb:
+    docker:
+    - image: circleci/golang:1.17
+      environment:
+        SQL_DRIVER: mysql
+        DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true&parseTime=true
+        REDIS_ENABLED: "true"
+        REDIS_URI: redis://:password@127.0.0.1:6379
+    - image: mariadb:10.7
+      environment:
+        MYSQL_DATABASE: versions
+        MYSQL_USER: versions
+        MYSQL_PASSWORD: versions
+        MYSQL_ROOT_PASSWORD: versions
+    - image: bitnami/redis:6.2
+      environment:
+        REDIS_PASSWORD: password
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - versions-api-mariadb-{{ checksum "go.mod" }}
+    
+    - run:
+        name: go mod download
+        command: go mod download
+
+    - run:
+        name: go vet
+        command: go vet
+
+    - run:
+        name: Wait for DB to be ready
+        command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
+    
+    - run:
+        name: Wait for REDIS to be ready
+        command: dockerize -wait tcp://127.0.0.1:6379 -timeout 1m
+    
+    - save_cache:
+        key: versions-api-mariadb-{{ checksum "go.mod" }}
+        paths:
+        - /go/pkg/mod
+
+    - run:
+        name: Init DB
+        command: |
+          go run main.go &
+          sleep 10
+          pgrep main |xargs -n1 -P1 kill
+
+    - run:
+        name: Perform unit testing
+        command: |
+          go test -v ./... -coverprofile=coverage.out
+          go tool cover -func=coverage.out
+
+  postgres:
+    docker:
+    - image: circleci/golang:1.17
+      environment:
+        SQL_DRIVER: postgres
+        DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
+        REDIS_ENABLED: "true"
+        REDIS_URI: redis://:password@127.0.0.1:6379
+    - image: postgres:14
+      environment:
+        POSTGRES_DB: versions
+        POSTGRES_USER: versions
+        POSTGRES_PASSWORD: versions
+    - image: bitnami/redis:6.2
+      environment:
+        REDIS_PASSWORD: password
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - versions-api-postgres-{{ checksum "go.mod" }}
+
+    - run:
+        name: go mod download
+        command: go mod download
+
+    - run:
+        name: go vet
+        command: go vet
+
+    - run:
+        name: Wait for DB to be ready
+        command: dockerize -wait tcp://127.0.0.1:5432 -timeout 1m
+
+    - run:
+        name: Wait for REDIS to be ready
+        command: dockerize -wait tcp://127.0.0.1:6379 -timeout 1m
+    
+    - save_cache:
+        key: versions-api-postgres-{{ checksum "go.mod" }}
+        paths:
+        - /go/pkg/mod
+
+    - run:
+        name: Init DB
+        command: |
+          go run main.go &
+          sleep 10
+          pgrep main |xargs -n1 -P1 kill
+
+    - run:
+        name: Perform unit testing
+        command: |
+          go test -v ./... -coverprofile=coverage.out
+          go tool cover -func=coverage.out
+
+  build-tags-and-publish-prerelease:
+    executor: golang
+    environment:
+      KIND_VERSION: 0.11.1
+      KIND_VERSION_NODE: 1.22.0
+      KIND_CLUSTER_NAME: dc1
+      HELM_VERSION: 3.7.2
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
+      NAMESPACE: versions
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
+
+    - run:
+        name: Install curl, kind, kubectl, and helm
+        command: |
+          sudo apt update
+          sudo apt install -yyq --no-install-recommends curl git
+
+          curl --fail --retry 3 -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+
+          curl --fail --retry 3 -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          
+          curl --fail --retry 3 -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          tar xzf helm-v${HELM_VERSION}-linux-amd64.tar.gz
+          chmod +x linux-amd64/helm
+          sudo mv linux-amd64/helm /usr/local/bin
+
+    - run:
+        name: Create kind clusters
+        command: |
+          kind create cluster --name ${KIND_CLUSTER_NAME} --image kindest/node:v${KIND_VERSION_NODE} --wait 5m --config .circleci/kind-config.yaml
+
+    - run:
+        name: Get kind clusters / kubectl get cluster-info
+        command: |
+          kind get clusters
+          kubectl cluster-info --context kind-${KIND_CLUSTER_NAME}
+
+    - run:
+        name: Clone helm charts
+        command: |
+          git clone https://github.com/Lord-Y/helm.git helm-charts
+
+    - run:
+        name: Build docker image
+        command: |
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+
+    - run:
+        name: Deploy tagged build
+        command: |
+          kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG}
+          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
+
+    - run:
+        name: List pods
+        command: |
+          kubectl get pods --namespace ${NAMESPACE} --context kind-${KIND_CLUSTER_NAME}
+
+    - run:
+        name: Publish prerelease
+        command: |
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+          go get github.com/github-release/github-release
+          git checkout .
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions-api/blob/main/CHANGELOG.md)" -p
+
+
+  build-tags-and-publish-release:
+    executor: golang
+    environment:
+      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
+
+    - run:
+        name: Build docker image
+        command: |
+          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
+          docker push ${IMAGE_NAME}:${CIRCLE_TAG}
+
+    - run:
+        name: Publish release
+        command: |
+          go get github.com/github-release/github-release
+          git checkout .
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions-api/blob/main/CHANGELOG.md)"
+
+# https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+    - mariadb:
+        context: GITHUB
+        filters:
+          tags:
+            only: /.*/
+    - postgres:
+        context: GITHUB
+        filters:
+          tags:
+            only: /.*/
+    - build-tags-and-publish-prerelease:
+        context: GITHUB
+        requires:
+        - mariadb
+        - postgres
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+-(.*)$/
+          branches:
+            ignore: /.*/
+    - build-tags-and-publish-release:
+        context: GITHUB
+        requires:
+        - mariadb
+        - postgres
+        filters:
+          tags:
+            only: /^v\d+\.\d+\.\d+$/
+          branches:
+            ignore: /.*/
