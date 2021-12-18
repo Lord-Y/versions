@@ -1,0 +1,3 @@
+ALTER TABLE versions ALTER COLUMN raw SET DEFAULT '';
+ALTER TABLE versions ALTER COLUMN status SET DEFAULT '';
+ALTER TABLE versions ALTER COLUMN changelog_url SET DEFAULT '';
