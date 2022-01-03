@@ -17,6 +17,7 @@ jobs:
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true&parseTime=true
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
+        IMAGE_NAME: ghcr.io/lord-y/versions/versions
     - image: mariadb:10.7
       environment:
         MYSQL_DATABASE: versions
@@ -102,6 +103,7 @@ jobs:
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
+        IMAGE_NAME: ghcr.io/lord-y/versions/versions
     - image: postgres:14
       environment:
         POSTGRES_DB: versions
