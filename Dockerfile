@@ -1,37 +1,38 @@
-############################
-# STEP 1 build executable binary
-############################
-ARG DOCKER_IMAGE_GOLANG="mirror.gcr.io/library/golang:1.17-alpine"
-FROM ${DOCKER_IMAGE_GOLANG} as builder
-# Install git + SSL ca certificates.
-# Git is required for fetching the dependencies.
-# Ca-certificates is required to call HTTPS endpoints.
+ARG DOCKER_IMAGE_NODEJS="node:14-alpine"
+ARG DOCKER_IMAGE_GOLANG="golang:1.17-alpine"
+
+FROM ${DOCKER_IMAGE_NODEJS} as buildernode
+RUN mkdir /app
+WORKDIR /app
+COPY ui .
+RUN rm -rf .git .env*
+RUN apk update && apk upgrade
+RUN apk add --no-cache git curl && rm -rf /var/cache/apk/*
+RUN npm install
+RUN npm run build
+
+FROM ${DOCKER_IMAGE_GOLANG} as buildergo
 RUN apk update && apk add --no-cache git ca-certificates
-# Create appuser
 RUN adduser -D -g '' appuser
 COPY . $GOPATH/src/
 WORKDIR $GOPATH/src/
+RUN rm -rf ui/dist routers/ui/dist
+COPY --from=buildernode /app/dist ui/dist
+COPY --from=buildernode /app/dist routers/ui/dist
 RUN rm -rf $GOPATH/pkg/* $GOPATH/src/go.sum $GOPATH/.git /var/cache/apk/*
 ENV GOBIN=$GOPATH/bin
 ENV PATH=$GOBIN:$PATH
 ENV GO111MODULE=on
 RUN go env -w GOFLAGS=-mod=mod
-# Fetch dependencies.
-# Using go mod with go >= 1.11
+RUN go env
 RUN go mod download
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install -a -tags netgo -ldflags '-w -extldflags "-static"' .
-############################
-# STEP 2 build a small image
-############################
+
 FROM scratch
 # Import from builder.
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /etc/passwd /etc/passwd
-# Copy our static executable
-COPY --from=builder /go/bin/versions-api /go/bin/
-COPY --from=builder /go/src/sql/ /sql
-# Use an unprivileged user.
+COPY --from=buildergo /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=buildergo /etc/passwd /etc/passwd
+COPY --from=buildergo /go/bin/versions /go/bin/
 USER appuser
-# Run the APP_NAME binary.
-ENTRYPOINT ["/go/bin/versions-api"]
+ENTRYPOINT ["/go/bin/versions"]
