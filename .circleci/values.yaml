@@ -4,7 +4,7 @@ container:
   port: &cport 8080
 
 image:
-  repository: docker.pkg.github.com/lord-y/versions-api/versions-api
+  repository: ghcr.io/lord-y/versions/versions
   tag: latest
 
 initialDelaySeconds: &initialDelaySeconds 60
