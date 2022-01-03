@@ -1,3 +1,4 @@
-statics/js/unitegallery/test.js
-statics/js/unitegallery/gallery.js
+src/shims-vue.d.ts
+.tmp
 node_modules
+dist
