@@ -1,7 +1,10 @@
 package routers
 
 import (
+	"embed"
 	"io"
+	"io/fs"
+	"net/http"
 	"os"
 	"time"
 
@@ -10,6 +13,7 @@ import (
 	"github.com/Lord-Y/versions/metrics"
 	"github.com/Lord-Y/versions/versionning"
 	"github.com/gin-contrib/logger"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	ginprometheus "github.com/mcuadros/go-gin-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
@@ -21,6 +25,12 @@ func init() {
 	customLogger.SetLoggerLogLevel()
 }
 
+//go:embed ui/dist/assets
+var assets embed.FS
+
+//go:embed ui
+var ui_ embed.FS
+
 // SetupRouter gin
 func SetupRouter() *gin.Engine {
 	gin.DisableConsoleColor()
@@ -30,6 +40,7 @@ func SetupRouter() *gin.Engine {
 
 	router := gin.New()
 	router.Use(gin.Recovery())
+	router.RedirectTrailingSlash = true
 
 	router.Use(
 		logger.SetLogger(
@@ -79,5 +90,79 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/stats/latest", versionning.GetLastXDaysDeployments)
 	}
 
+	router.StaticFS("/ui/assets", EmbedFolder(assets, "ui/dist/assets"))
+
+	// done like that to avoid trailing slash
+	router.GET("/ui/logo.png", func(c *gin.Context) {
+		f, _ := ui_.ReadFile("ui/dist/logo.png")
+		c.Data(
+			http.StatusOK,
+			"image/png",
+			f,
+		)
+	})
+
+	// done like that to avoid trailing slash
+	router.GET("/ui/favicon.ico", func(c *gin.Context) {
+		f, _ := ui_.ReadFile("ui/dist/favicon.ico")
+		c.Data(
+			http.StatusOK,
+			"image/x-icon",
+			f,
+		)
+	})
+
+	ui := router.Group("/ui", func(c *gin.Context) {
+		f, _ := ui_.ReadFile("ui/dist/index.html")
+		c.Data(
+			http.StatusOK,
+			"text/html",
+			f,
+		)
+	})
+	if ui.BasePath() == "/ui" {
+		router.NoRoute(func(c *gin.Context) {
+			f, _ := ui_.ReadFile("ui/dist/index.html")
+			c.Data(
+				http.StatusOK,
+				"text/html",
+				f,
+			)
+		})
+	}
+
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/ui/")
+	})
+
 	return router
+}
+
+type embedFileSystem struct {
+	http.FileSystem
+	indexes bool
+}
+
+func (e embedFileSystem) Exists(prefix string, path string) bool {
+	f, err := e.Open(path)
+	if err != nil {
+		return false
+	}
+
+	s, _ := f.Stat()
+	if s.IsDir() && !e.indexes {
+		return false
+	}
+
+	return true
+}
+
+func EmbedFolder(fsEmbed embed.FS, targetPath string) static.ServeFileSystem {
+	fsys, err := fs.Sub(fsEmbed, targetPath)
+	if err != nil {
+		panic(err)
+	}
+	return embedFileSystem{
+		FileSystem: http.FS(fsys),
+	}
 }

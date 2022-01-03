@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/alecthomas/assert v1.0.0
 	github.com/gin-contrib/logger v0.2.0
+	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-sql-driver/mysql v1.6.0
