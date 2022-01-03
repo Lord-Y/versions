@@ -18,7 +18,7 @@ jobs:
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
         IMAGE_NAME: ghcr.io/lord-y/versions/versions
-    - image: mariadb:10.7
+    - image: circleci/mariadb:10.7
       environment:
         MYSQL_DATABASE: versions
         MYSQL_USER: versions
@@ -70,29 +70,28 @@ jobs:
           mkdir -p routers/ui
           cp -r ui/dist routers/ui
 
-    # - run:
-    #     name: Init DB
-    #     command: |
-    #       sleep 120
-    #       go run main.go &
-    #       sleep 10
-    #       pgrep main |xargs -n1 -P1 kill
+    - run:
+        name: Init DB
+        command: |
+          go run main.go &
+          sleep 10
+          pgrep main |xargs -n1 -P1 kill
 
-    # - run:
-    #     name: Perform unit testing
-    #     command: |
-    #       go test -v ./... -coverprofile=coverage.out
-    #       go tool cover -func=coverage.out
+    - run:
+        name: Perform unit testing
+        command: |
+          go test -v ./... -coverprofile=coverage.out
+          go tool cover -func=coverage.out
 
-    # - run:
-    #     name: Print result of unit testing
-    #     command: go tool cover -func=coverage.out
+    - run:
+        name: Print result of unit testing
+        command: go tool cover -func=coverage.out
 
-    # - run:
-    #     name: Build docker image
-    #     command: |
-    #       export CUSTOM_TAG=$(git rev-parse --short HEAD)
-    #       docker build -t ${IMAGE_NAME}:${CUSTOM_TAG}-mysql .
+    - run:
+        name: Build docker image
+        command: |
+          export CUSTOM_TAG=$(git rev-parse --short HEAD)
+          docker build -t ${IMAGE_NAME}:${CUSTOM_TAG}-mysql .
 
   postgres:
     docker:
@@ -103,7 +102,7 @@ jobs:
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
         IMAGE_NAME: ghcr.io/lord-y/versions/versions
-    - image: postgres:14
+    - image: circleci/postgres:13 # circleci/postgres:14 does not exist in https://github.com/CircleCI-Public/circleci-dockerfiles/tree/master/postgres/images
       environment:
         POSTGRES_DB: versions
         POSTGRES_USER: versions
@@ -154,29 +153,28 @@ jobs:
           mkdir -p routers/ui
           cp -r ui/dist routers/ui
 
-    # - run:
-    #     name: Init DB
-    #     command: |
-    #       sleep 120
-    #       go run main.go &
-    #       sleep 10
-    #       pgrep main |xargs -n1 -P1 kill
+    - run:
+        name: Init DB
+        command: |
+          go run main.go &
+          sleep 10
+          pgrep main |xargs -n1 -P1 kill
 
-    # - run:
-    #     name: Perform unit testing
-    #     command: |
-    #       go test -v ./... -coverprofile=coverage.out
-    #       go tool cover -func=coverage.out
+    - run:
+        name: Perform unit testing
+        command: |
+          go test -v ./... -coverprofile=coverage.out
+          go tool cover -func=coverage.out
 
-    # - run:
-    #     name: Print result of unit testing
-    #     command: go tool cover -func=coverage.out
+    - run:
+        name: Print result of unit testing
+        command: go tool cover -func=coverage.out
 
-    # - run:
-    #     name: Build docker image
-    #     command: |
-    #       export CUSTOM_TAG=$(git rev-parse --short HEAD)
-    #       docker build -t ${IMAGE_NAME}:${CUSTOM_TAG}-pg .
+    - run:
+        name: Build docker image
+        command: |
+          export CUSTOM_TAG=$(git rev-parse --short HEAD)
+          docker build -t ${IMAGE_NAME}:${CUSTOM_TAG}-pg .
 
   build-tags-and-publish-prerelease:
     executor: golang
