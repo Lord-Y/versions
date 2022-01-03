@@ -32,6 +32,11 @@ export REDIS_URI=redis://:xxxxx@host:port
 SQL_DRIVER can only be `mysql` or `postgres`
 At startup, the DB initialization or migration will be handle.
 
+Here are the supported versions:
+- postgres 10 and above
+- mariadb 10.x and above
+- mysql 5.7 and above
+
 ## Running port number
 
 Port number can be change:
