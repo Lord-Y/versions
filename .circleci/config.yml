@@ -11,7 +11,7 @@ executors:
 jobs:
   mariadb:
     docker:
-    - image: circleci/golang:1.17
+    - image: cimg/go:1.17-node
       environment:
         SQL_DRIVER: mysql
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true&parseTime=true
@@ -94,7 +94,7 @@ jobs:
 
   postgres:
     docker:
-    - image: circleci/golang:1.17
+    - image: cimg/go:1.17-node
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
