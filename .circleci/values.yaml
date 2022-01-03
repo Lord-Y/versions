@@ -38,6 +38,7 @@ env:
   APP_PROMETHEUS: "true"
   SQL_DRIVER: mysql
   DB_URI: "versions:versions@tcp(versions-api-mariadb:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true"
+  APP_PROMETHEUS: "true"
 
 metrics:
   serviceMonitor:
