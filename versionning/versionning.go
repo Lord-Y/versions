@@ -179,7 +179,7 @@ func ReadEnvironmentLatest(c *gin.Context) {
 		return
 	}
 
-	if strings.Contains(c.Request.URL.Path, "/api/v1/versions/read/environment/latest/whatever") {
+	if strings.Contains(c.Request.URL.Path, "/api/v1/read/environment/latest/whatever") {
 		d.Whatever = true
 	}
 

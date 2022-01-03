@@ -12,7 +12,7 @@ livenessProbe:
   custom:
     failureThreshold: 3
     httpGet:
-      path: /api/v1/versions/health
+      path: /api/v1/health
       port: http
       scheme: HTTP
     initialDelaySeconds: *initialDelaySeconds
@@ -24,7 +24,7 @@ readinessProbe:
   custom:
     failureThreshold: 3
     httpGet:
-      path: /api/v1/versions/health
+      path: /api/v1/health
       port: http
       scheme: HTTP
     initialDelaySeconds: *initialDelaySeconds

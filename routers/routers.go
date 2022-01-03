@@ -70,7 +70,7 @@ func SetupRouter() *gin.Engine {
 		prometheus.MustRegister(metrics.LastDeployments())
 	}
 
-	v1 := router.Group("/api/v1/versions")
+	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/health", health.Health)
 		v1.HEAD("/health", health.Health)

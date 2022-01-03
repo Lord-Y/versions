@@ -1,6 +1,6 @@
-# versions-api [![CircleCI](https://circleci.com/gh/Lord-Y/versions-api/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/versions-api?branch=main)
+# versions [![CircleCI](https://circleci.com/gh/Lord-Y/versions/tree/main.svg?style=svg)](https://circleci.com/gh/Lord-Y/versions?branch=main)
 
-# versions-api
+# versions
 
 This api permit to centralize all your applications versions deployed in order to know when it has been deployed and his content.
 
@@ -60,33 +60,33 @@ For POST request, both content-type
 
 ```bash
 # post requests with json
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.0.0","workload": "teamX", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamX", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.3.0","workload": "teamX", "environment":"dev", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "failed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.2.0","workload": "teamX", "environment":"integration", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.0.0","workload": "teamX", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamX", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.3.0","workload": "teamX", "environment":"dev", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "failed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.2.0","workload": "teamX", "environment":"integration", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
 
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.0.0","workload": "teamY", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamY", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.3.0","workload": "teamY", "environment":"dev", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.2.0","workload": "teamY", "environment":"integration", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.0.0","workload": "teamY", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamY", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.3.0","workload": "teamY", "environment":"dev", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.2.0","workload": "teamY", "environment":"integration", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
 
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.0.0","workload": "teamZ", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamZ", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.3.0","workload": "teamZ", "environment":"dev", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.2.0","workload": "teamZ", "environment":"integration", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "0.2.0","workload": "teamZ", "environment":"test", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
-curl -XPOST 0:8080/api/v1/versions/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamZ", "environment":"preproduction", "platform": "preproduction", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.0.0","workload": "teamZ", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamZ", "environment":"production", "platform": "production", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "ongoing"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.3.0","workload": "teamZ", "environment":"dev", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.2.0","workload": "teamZ", "environment":"integration", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "0.2.0","workload": "teamZ", "environment":"test", "platform": "development", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
+curl -XPOST 0:8080/api/v1/create -H 'Content-type: application/json' -d '{"version": "1.1.0","workload": "teamZ", "environment":"preproduction", "platform": "preproduction", "changelogURL": "https://jsonplaceholder.typicode.com/", "raw": "{\"a\":\"b\"}", "status": "deployed"}'
 
 # post requests with form format mode
-curl -XPOST 0:8080/api/v1/versions/create -d 'version=1.1.0&workload=teamX&environment=production&platform=production&changelogURL=https://jsonplaceholder.typicode.com/&raw=rawContent&status=ongoing'
-curl -XPOST 0:8080/api/v1/versions/create -d 'version=1.3.0&workload=teamX&environment=production&platform=production&changelogURL=https://jsonplaceholder.typicode.com/&raw=rawContent&status=deployed'
-curl -XPOST 0:8080/api/v1/versions/create -d 'version=1.2.0&workload=teamX&environment=production&platform=production&changelogURL=https://jsonplaceholder.typicode.com/&raw=rawContent&status=failed'
+curl -XPOST 0:8080/api/v1/create -d 'version=1.1.0&workload=teamX&environment=production&platform=production&changelogURL=https://jsonplaceholder.typicode.com/&raw=rawContent&status=ongoing'
+curl -XPOST 0:8080/api/v1/create -d 'version=1.3.0&workload=teamX&environment=production&platform=production&changelogURL=https://jsonplaceholder.typicode.com/&raw=rawContent&status=deployed'
+curl -XPOST 0:8080/api/v1/create -d 'version=1.2.0&workload=teamX&environment=production&platform=production&changelogURL=https://jsonplaceholder.typicode.com/&raw=rawContent&status=failed'
 ```
 
 Each `POST` return the id of the deployment like so `{"versionId":14}`.
 To update the status of the deployment:
 ```bash
-curl -XPOST 0:8080/api/v1/versions/update/status -H 'Content-type: application/json' -d '{"versionId": "14","status": "deployed"}'
+curl -XPOST 0:8080/api/v1/update/status -H 'Content-type: application/json' -d '{"versionId": "14","status": "deployed"}'
 ```
 
 Here is an example of DB content:
@@ -116,13 +116,13 @@ Here is an example of DB content:
 Sometimes, you may need to fetch dynamically latest deployment.
 You can fetch it like so:
 ```bash
-curl '0:8080/api/v1/versions/read/environment/latest?workload=teamX&environment=production&platform=production'
+curl '0:8080/api/v1/read/environment/latest?workload=teamX&environment=production&platform=production'
 ```
 It will query latest version with `status` equal to `deployed` or `completed`.
 
 You can also use:
 ```bash
-curl '0:8080/api/v1/versions/read/environment/latest/whatever?workload=teamX&environment=production&platform=production'
+curl '0:8080/api/v1/read/environment/latest/whatever?workload=teamX&environment=production&platform=production'
 ```
 It will fetch the latest version deployed without checking the `status` of the deployment.
 
@@ -130,7 +130,7 @@ It will fetch the latest version deployed without checking the `status` of the d
 
 Golang metrics are built-in in our API.
 
-We also add last 10 days deployments by status on `curl 0:8080/api/v1/versions/stats/latest` but also on `curl 0:9101/metrics |grep versions_last_deployments_by_status`
+We also add last 10 days deployments by status on `curl 0:8080/api/v1/stats/latest` but also on `curl 0:9101/metrics |grep versions_last_deployments_by_status`
 
 ## Contributing
 

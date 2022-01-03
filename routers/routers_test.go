@@ -70,7 +70,7 @@ func TestHealth(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/health", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/health", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -86,7 +86,7 @@ func TestHealthz(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/healthz", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/healthz", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -105,7 +105,7 @@ func TestHealth_prometheus(t *testing.T) {
 	os.Setenv("APP_PROMETHEUS", "1")
 	defer os.Unsetenv("APP_PROMETHEUS")
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/health", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/health", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -147,7 +147,7 @@ func TestCreate(t *testing.T) {
 		payload += "&raw={'a': 'b'}"
 		payload += "&status=ongoing"
 
-		w, err := performRequest(router, headers, "POST", "/api/v1/versions/create", payload)
+		w, err := performRequest(router, headers, "POST", "/api/v1/create", payload)
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
 			t.Fail()
@@ -170,7 +170,7 @@ func TestCreate(t *testing.T) {
 			}
 			payloadStatus := fmt.Sprintf("versionId=%d&status=%s", r.VersionId, commons.RandomValueFromArray(statusList))
 
-			wu, err := performRequest(router, headers, "POST", "/api/v1/versions/update/status", payloadStatus)
+			wu, err := performRequest(router, headers, "POST", "/api/v1/update/status", payloadStatus)
 			if err != nil {
 				log.Error().Err(err).Msg("Error occured while performing http request")
 				t.Fail()
@@ -209,7 +209,7 @@ func TestReadEnvironment_200(t *testing.T) {
 		}
 	}
 	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
-		url := fmt.Sprintf("/api/v1/versions/read/environment?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
+		url := fmt.Sprintf("/api/v1/read/environment?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
@@ -227,7 +227,7 @@ func TestReadEnvironment_400(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/environment?workload=plop", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/read/environment?workload=plop", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -242,7 +242,7 @@ func TestReadEnvironment_404(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/environment?workload=plop&platform=platform&environment=environment", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/read/environment?workload=plop&platform=platform&environment=environment", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -276,7 +276,7 @@ func TestReadEnvironmentLatest_200(t *testing.T) {
 		}
 	}
 	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
-		url := fmt.Sprintf("/api/v1/versions/read/environment/latest?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
+		url := fmt.Sprintf("/api/v1/read/environment/latest?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
@@ -313,7 +313,7 @@ func TestReadEnvironmentLatestWhatever_200(t *testing.T) {
 		}
 	}
 	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
-		url := fmt.Sprintf("/api/v1/versions/read/environment/latest/whatever?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
+		url := fmt.Sprintf("/api/v1/read/environment/latest/whatever?workload=%s&platform=%s&environment=%s", result.Workload, result.Platform, result.Environment)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
@@ -331,7 +331,7 @@ func TestReadEnvironmentLatest_404(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/environment?workload=plop&platform=platform&environment=environment", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/read/environment?workload=plop&platform=platform&environment=environment", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -366,7 +366,7 @@ func TestReadPlatform_200(t *testing.T) {
 		}
 	}
 	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
-		url := fmt.Sprintf("/api/v1/versions/read/platform?workload=%s&platform=%s", result.Workload, result.Platform)
+		url := fmt.Sprintf("/api/v1/read/platform?workload=%s&platform=%s", result.Workload, result.Platform)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
@@ -384,7 +384,7 @@ func TestReadPlatform_400(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/platform?workload=plop", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/read/platform?workload=plop", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -399,7 +399,7 @@ func TestReadPlatform_404(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/platform?workload=plop&platform=platform", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/read/platform?workload=plop&platform=platform", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -414,7 +414,7 @@ func TestReadDistinctWorkloads(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/read/distinct/workloads", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/read/distinct/workloads", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()
@@ -449,7 +449,7 @@ func TestReadRaw_200(t *testing.T) {
 		}
 	}
 	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
-		url := fmt.Sprintf("/api/v1/versions/read/raw?workload=%s&platform=%s&environment=%s&version=%s", result.Workload, result.Platform, result.Environment, result.Version)
+		url := fmt.Sprintf("/api/v1/read/raw?workload=%s&platform=%s&environment=%s&version=%s", result.Workload, result.Platform, result.Environment, result.Version)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
@@ -486,7 +486,7 @@ func TestReadRawID_200(t *testing.T) {
 		}
 	}
 	if result != (models.DBCommons{}) && result.Workload != "" && result.Platform != "" {
-		url := fmt.Sprintf("/api/v1/versions/read/raw/id?versionId=%d", result.Versions_id)
+		url := fmt.Sprintf("/api/v1/read/raw/id?versionId=%d", result.Versions_id)
 		w, err := performRequest(router, headers, "GET", url, "")
 		if err != nil {
 			log.Error().Err(err).Msg("Error occured while performing http request")
@@ -503,7 +503,7 @@ func TestStatsLatest_200(t *testing.T) {
 
 	assert := assert.New(t)
 	router := SetupRouter()
-	w, err := performRequest(router, headers, "GET", "/api/v1/versions/stats/latest", "")
+	w, err := performRequest(router, headers, "GET", "/api/v1/stats/latest", "")
 	if err != nil {
 		log.Error().Err(err).Msg("Error occured while performing http request")
 		t.Fail()

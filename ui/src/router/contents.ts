@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/read/home',
+          default: '/api/v1/read/home',
         },
       },
     },
@@ -27,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/stats/latest',
+          default: '/api/v1/stats/latest',
         },
       },
     },
@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/read/platform',
+          default: '/api/v1/read/platform',
         },
       },
     },
@@ -57,7 +57,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/read/platform',
+          default: '/api/v1/read/platform',
         },
       },
     },
@@ -72,7 +72,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/read/environment',
+          default: '/api/v1/read/environment',
         },
       },
     },
@@ -87,7 +87,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/read/environment',
+          default: '/api/v1/read/environment',
         },
       },
     },
@@ -101,7 +101,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/read/raw',
+          default: '/api/v1/read/raw',
         },
       },
     },
@@ -115,7 +115,7 @@ const routes: Array<RouteRecordRaw> = [
     props: {
       url: {
         api: {
-          default: '/api/v1/versions/read/raw',
+          default: '/api/v1/read/raw',
         },
       },
     },

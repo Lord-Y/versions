@@ -23,7 +23,7 @@ export default function () {
       {
         'Content-Type': 'application/json',
       },
-      '/api/v1/versions/read/distinct/workloads',
+      '/api/v1/read/distinct/workloads',
       {},
     )
     .then((response: any) => {
