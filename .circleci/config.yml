@@ -105,7 +105,7 @@ jobs:
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
         IMAGE_NAME: ghcr.io/lord-y/versions/versions
-    - image: cimg/postgres:14
+    - image: cimg/postgres:14.1
       environment:
         POSTGRES_DB: versions
         POSTGRES_USER: versions
