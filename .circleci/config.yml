@@ -2,6 +2,9 @@
 version: 2.1
 
 # https://circleci.com/docs/2.0/configuration-reference/#machine
+# https://github.com/CircleCI-Public/cimg-postgres
+# https://github.com/CircleCI-Public/cimg-mariadb
+# 
 
 executors:
   golang:
@@ -18,7 +21,7 @@ jobs:
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
         IMAGE_NAME: ghcr.io/lord-y/versions/versions
-    - image: circleci/mariadb:10.7
+    - image: cimg/mariadb:10.6
       environment:
         MYSQL_DATABASE: versions
         MYSQL_USER: versions
@@ -102,7 +105,7 @@ jobs:
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
         IMAGE_NAME: ghcr.io/lord-y/versions/versions
-    - image: circleci/postgres:13 # circleci/postgres:14 does not exist in https://github.com/CircleCI-Public/circleci-dockerfiles/tree/master/postgres/images
+    - image: cimg/postgres:14
       environment:
         POSTGRES_DB: versions
         POSTGRES_USER: versions
