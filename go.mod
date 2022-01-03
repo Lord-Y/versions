@@ -1,4 +1,4 @@
-module github.com/Lord-Y/versions-api
+module github.com/Lord-Y/versions
 
 go 1.17
 

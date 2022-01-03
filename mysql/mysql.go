@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Lord-Y/versions-api/commons"
-	customLogger "github.com/Lord-Y/versions-api/logger"
-	"github.com/Lord-Y/versions-api/models"
+	"github.com/Lord-Y/versions/commons"
+	customLogger "github.com/Lord-Y/versions/logger"
+	"github.com/Lord-Y/versions/models"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/mysql"

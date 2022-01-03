@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Lord-Y/versions-api/commons"
-	customLogger "github.com/Lord-Y/versions-api/logger"
-	"github.com/Lord-Y/versions-api/models"
+	"github.com/Lord-Y/versions/commons"
+	customLogger "github.com/Lord-Y/versions/logger"
+	"github.com/Lord-Y/versions/models"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"

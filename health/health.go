@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Lord-Y/versions-api/mysql"
-	"github.com/Lord-Y/versions-api/postgres"
+	"github.com/Lord-Y/versions/mysql"
+	"github.com/Lord-Y/versions/postgres"
 	"github.com/gin-gonic/gin"
 )
 

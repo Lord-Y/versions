@@ -1,10 +1,10 @@
 package metrics
 
 import (
-	"github.com/Lord-Y/versions-api/commons"
-	"github.com/Lord-Y/versions-api/models"
-	"github.com/Lord-Y/versions-api/mysql"
-	"github.com/Lord-Y/versions-api/postgres"
+	"github.com/Lord-Y/versions/commons"
+	"github.com/Lord-Y/versions/models"
+	"github.com/Lord-Y/versions/mysql"
+	"github.com/Lord-Y/versions/postgres"
 	"github.com/rs/zerolog/log"
 )
 

@@ -11,11 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Lord-Y/versions-api/commons"
-	customLogger "github.com/Lord-Y/versions-api/logger"
-	"github.com/Lord-Y/versions-api/mysql"
-	"github.com/Lord-Y/versions-api/postgres"
-	"github.com/Lord-Y/versions-api/routers"
+	"github.com/Lord-Y/versions/commons"
+	customLogger "github.com/Lord-Y/versions/logger"
+	"github.com/Lord-Y/versions/mysql"
+	"github.com/Lord-Y/versions/postgres"
+	"github.com/Lord-Y/versions/routers"
 	"github.com/rs/zerolog/log"
 )
 
