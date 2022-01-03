@@ -4,17 +4,18 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"os"
+	"embed"
+	"net/http"
 	"strings"
 
 	"github.com/Lord-Y/versions/commons"
 	customLogger "github.com/Lord-Y/versions/logger"
 	"github.com/Lord-Y/versions/models"
-	"github.com/golang-migrate/migrate"
-	"github.com/golang-migrate/migrate/database/postgres"
-	_ "github.com/golang-migrate/migrate/source/file"
-	"github.com/jackc/pgx"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/httpfs"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -24,22 +25,23 @@ func init() {
 }
 
 // InitDB permit to initialiaze or migrate databases
-func InitDB() {
-	log.Debug().Msg("starting db initialization/migration")
-	fileDir, err := os.Getwd()
+func InitDB(source embed.FS) {
+	src, err := httpfs.New(http.FS(source), "sql/postgres")
 	if err != nil {
-		log.Fatal().Err(err).Msg("Not able to get current directory")
+		log.Fatal().Err(err).Msgf("Failed to get embedded sql directory")
+		return
 	}
-	log.Debug().Msgf("Use db sql driver %s", commons.SqlDriver)
-	sqlDIR := fmt.Sprintf("file://%s%s", fileDir, "/sql/postgres")
+	log.Debug().Msg("starting db initialization/migration")
+	log.Debug().Msgf("Use db sql driver %s", "postgres")
 	db, err := sql.Open(
-		commons.SqlDriver,
+		"postgres",
 		commons.BuildDSN(),
 	)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to connect to DB")
 		return
 	}
+	defer db.Close()
 	if err := db.Ping(); err != nil {
 		log.Fatal().Err(err).Msgf("could not ping DB: %s", err.Error())
 	}
@@ -48,11 +50,16 @@ func InitDB() {
 		log.Fatal().Err(err).Msgf("Could not start sql migration with error msg: %s", err.Error())
 		return
 	}
-	m, err := migrate.NewWithDatabaseInstance(
-		sqlDIR,
-		commons.SqlDriver,
+	m, err := migrate.NewWithInstance(
+		"httpfs",
+		src,
+		"postgres",
 		driver,
 	)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("Migration failed: %s", err.Error())
+		return
+	}
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Migration failed: %s", err.Error())
 		return

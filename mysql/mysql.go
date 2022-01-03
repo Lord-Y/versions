@@ -4,17 +4,18 @@ package mysql
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"os"
+	"embed"
+	"net/http"
 	"strings"
 
 	"github.com/Lord-Y/versions/commons"
 	customLogger "github.com/Lord-Y/versions/logger"
 	"github.com/Lord-Y/versions/models"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/golang-migrate/migrate"
-	"github.com/golang-migrate/migrate/database/mysql"
-	_ "github.com/golang-migrate/migrate/source/file"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/httpfs"
 	"github.com/rs/zerolog/log"
 )
 
@@ -23,14 +24,14 @@ func init() {
 }
 
 // InitDB permit to initialiaze or migrate databases
-func InitDB() {
-	log.Debug().Msg("Starting db initialization/migration")
-	fileDir, err := os.Getwd()
+func InitDB(source embed.FS) {
+	src, err := httpfs.New(http.FS(source), "sql/mysql")
 	if err != nil {
-		log.Fatal().Err(err).Msg("Not able to get current directory")
+		log.Fatal().Err(err).Msgf("Failed to get embedded sql directory")
+		return
 	}
-	log.Debug().Msgf("Use db sql driver %s", commons.SqlDriver)
-	sqlDIR := fmt.Sprintf("file://%s%s", fileDir, "/sql/mysql")
+	log.Debug().Msg("Starting db initialization/migration")
+	log.Debug().Msg("Use db sql driver mysql")
 	db, err := sql.Open(
 		commons.SqlDriver,
 		commons.BuildDSN(),
@@ -47,9 +48,10 @@ func InitDB() {
 		log.Fatal().Err(err).Msgf("Could not start sql migration with error msg: %s", err.Error())
 		return
 	}
-	m, err := migrate.NewWithDatabaseInstance(
-		sqlDIR,
-		commons.SqlDriver,
+	m, err := migrate.NewWithInstance(
+		"httpfs",
+		src,
+		"mysql",
 		driver,
 	)
 	if err != nil {

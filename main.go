@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"net/http"
 	"os"
@@ -18,6 +19,12 @@ import (
 	"github.com/Lord-Y/versions/routers"
 	"github.com/rs/zerolog/log"
 )
+
+//go:embed sql/postgres
+var sqlpostgres embed.FS
+
+//go:embed sql/mysql
+var sqlmysql embed.FS
 
 func init() {
 	customLogger.SetLoggerLogLevel()
@@ -48,9 +55,9 @@ func init() {
 
 	switch commons.SqlDriver {
 	case "mysql":
-		mysql.InitDB()
+		mysql.InitDB(sqlmysql)
 	case "postgres":
-		postgres.InitDB()
+		postgres.InitDB(sqlpostgres)
 	default:
 		msg := "SQL_DRIVER environment variable can only be mysql or postgres"
 		log.Fatal().Err(fmt.Errorf(msg)).Msg(msg)
