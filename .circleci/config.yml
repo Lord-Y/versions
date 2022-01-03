@@ -1,10 +1,12 @@
 ---
 version: 2.1
 
+# https://circleci.com/docs/2.0/configuration-reference/#machine
+
 executors:
   golang:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:202111-01
 
 jobs:
   mariadb:
@@ -30,15 +32,18 @@ jobs:
 
     - restore_cache:
         keys:
-        - versions-api-mariadb-{{ checksum "go.mod" }}
+        - versions-mariadb-{{ checksum "go.mod" }}
     
     - run:
         name: go mod download
         command: go mod download
 
     - run:
-        name: go vet
-        command: go vet
+        name: npm install
+        command: |
+          cd ui
+          npm install
+          cd -
 
     - run:
         name: Wait for DB to be ready
@@ -49,9 +54,20 @@ jobs:
         command: dockerize -wait tcp://127.0.0.1:6379 -timeout 1m
     
     - save_cache:
-        key: versions-api-mariadb-{{ checksum "go.mod" }}
+        key: versions-mariadb-{{ checksum "go.mod" }}
         paths:
-        - /go/pkg/mod
+        - /home/circleci/.go_workspace/pkg/mod
+        - /home/circleci/.kube
+
+    - run:
+        name: npm run build
+        command: |
+          cd ui
+          npm run build
+          cd -
+          rm -rf routers/ui 
+          mkdir -p routers/ui
+          cp -r ui/dist routers/ui
 
     - run:
         name: Init DB
@@ -65,6 +81,16 @@ jobs:
         command: |
           go test -v ./... -coverprofile=coverage.out
           go tool cover -func=coverage.out
+
+    - run:
+        name: Print result of unit testing
+        command: go tool cover -func=coverage.out
+
+    - run:
+        name: Build docker image
+        command: |
+          export CUSTOM_TAG=$(git rev-parse --short HEAD)
+          docker build -t ${IMAGE_NAME}:${CUSTOM_TAG}-mysql .
 
   postgres:
     docker:
@@ -88,15 +114,18 @@ jobs:
 
     - restore_cache:
         keys:
-        - versions-api-postgres-{{ checksum "go.mod" }}
+        - versions-postgres-{{ checksum "go.mod" }}
 
     - run:
         name: go mod download
         command: go mod download
 
     - run:
-        name: go vet
-        command: go vet
+        name: npm install
+        command: |
+          cd ui
+          npm install
+          cd -
 
     - run:
         name: Wait for DB to be ready
@@ -107,9 +136,19 @@ jobs:
         command: dockerize -wait tcp://127.0.0.1:6379 -timeout 1m
     
     - save_cache:
-        key: versions-api-postgres-{{ checksum "go.mod" }}
-        paths:
-        - /go/pkg/mod
+        key: versions-postgres-{{ checksum "go.mod" }}
+        - /home/circleci/.go_workspace/pkg/mod
+        - /home/circleci/.kube
+
+    - run:
+        name: npm run build
+        command: |
+          cd ui
+          npm run build
+          cd -
+          rm -rf routers/ui 
+          mkdir -p routers/ui
+          cp -r ui/dist routers/ui
 
     - run:
         name: Init DB
@@ -124,6 +163,16 @@ jobs:
           go test -v ./... -coverprofile=coverage.out
           go tool cover -func=coverage.out
 
+    - run:
+        name: Print result of unit testing
+        command: go tool cover -func=coverage.out
+
+    - run:
+        name: Build docker image
+        command: |
+          export CUSTOM_TAG=$(git rev-parse --short HEAD)
+          docker build -t ${IMAGE_NAME}:${CUSTOM_TAG}-pg .
+
   build-tags-and-publish-prerelease:
     executor: golang
     environment:
@@ -131,7 +180,7 @@ jobs:
       KIND_VERSION_NODE: 1.22.0
       KIND_CLUSTER_NAME: dc1
       HELM_VERSION: 3.7.2
-      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
+      IMAGE_NAME: ghcr.io/lord-y/versions/versions
       NAMESPACE: versions
 
     steps:
@@ -179,14 +228,14 @@ jobs:
     - run:
         name: Build docker image
         command: |
-          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          echo "$GITHUB_TOKEN" | docker login https://ghcr.io -u ${CIRCLE_USERNAME} --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
 
     - run:
         name: Deploy tagged build
         command: |
           kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG}
-          helm upgrade -i --create-namespace versions-api helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
+          helm upgrade -i --create-namespace versions helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
 
     - run:
         name: List pods
@@ -199,13 +248,12 @@ jobs:
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
           go get github.com/github-release/github-release
           git checkout .
-          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions-api/blob/main/CHANGELOG.md)" -p
-
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions/blob/main/CHANGELOG.md)" -p
 
   build-tags-and-publish-release:
     executor: golang
     environment:
-      IMAGE_NAME: docker.pkg.github.com/lord-y/versions-api/versions-api
+      IMAGE_NAME: ghcr.io/lord-y/versions/versions
 
     steps:
     - checkout
@@ -217,7 +265,7 @@ jobs:
     - run:
         name: Build docker image
         command: |
-          echo "$GITHUB_TOKEN" | docker login https://docker.pkg.github.com -u ${CIRCLE_USERNAME} --password-stdin
+          echo "$GITHUB_TOKEN" | docker login https://ghcr.io -u ${CIRCLE_USERNAME} --password-stdin
           docker build -t ${IMAGE_NAME}:${CIRCLE_TAG} .
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
 
@@ -226,7 +274,7 @@ jobs:
         command: |
           go get github.com/github-release/github-release
           git checkout .
-          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions-api/blob/main/CHANGELOG.md)"
+          github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions/blob/main/CHANGELOG.md)"
 
 # https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
 workflows:
