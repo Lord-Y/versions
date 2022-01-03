@@ -73,8 +73,7 @@ jobs:
     - run:
         name: Init DB
         command: |
-          dockerize -wait tcp://127.0.0.1:3306 -timeout 5m
-          dockerize -wait tcp://127.0.0.1:6379 -timeout 5m
+          sleep 120
           go run main.go &
           sleep 10
           pgrep main |xargs -n1 -P1 kill
@@ -158,8 +157,7 @@ jobs:
     - run:
         name: Init DB
         command: |
-          dockerize -wait tcp://127.0.0.1:5432 -timeout 5m
-          dockerize -wait tcp://127.0.0.1:6379 -timeout 5m
+          sleep 120
           go run main.go &
           sleep 10
           pgrep main |xargs -n1 -P1 kill
