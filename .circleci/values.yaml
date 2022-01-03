@@ -1,4 +1,4 @@
-nameOverride: "versions-api"
+nameOverride: "versions"
 
 container:
   port: &cport 8080
