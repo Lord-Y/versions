@@ -137,6 +137,7 @@ jobs:
     
     - save_cache:
         key: versions-postgres-{{ checksum "go.mod" }}
+        paths:
         - /home/circleci/.go_workspace/pkg/mod
         - /home/circleci/.kube
 
