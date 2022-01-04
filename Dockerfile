@@ -6,6 +6,7 @@ RUN mkdir /app
 WORKDIR /app
 COPY ui .
 RUN rm -rf .git .env* dist
+RUN find .
 RUN apk update && apk upgrade
 RUN apk add --no-cache git curl && rm -rf /var/cache/apk/*
 RUN npm install
