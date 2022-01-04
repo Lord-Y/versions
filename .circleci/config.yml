@@ -36,7 +36,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - versions-mariadb-{{ checksum "go.mod" }}-1
+        - versions-mariadb-{{ checksum "go.mod" }}
     
     - run:
         name: go mod download
@@ -58,7 +58,7 @@ jobs:
         command: dockerize -wait tcp://127.0.0.1:6379 -timeout 5m
     
     - save_cache:
-        key: versions-mariadb-{{ checksum "go.mod" }}-1
+        key: versions-mariadb-{{ checksum "go.mod" }}
         paths:
         - /home/circleci/.go_workspace/pkg/mod
         - /home/circleci/.kube
@@ -121,7 +121,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - versions-postgres-{{ checksum "go.mod" }}-1
+        - versions-postgres-{{ checksum "go.mod" }}
 
     - run:
         name: go mod download
@@ -143,7 +143,7 @@ jobs:
         command: dockerize -wait tcp://127.0.0.1:6379 -timeout 5m
     
     - save_cache:
-        key: versions-postgres-{{ checksum "go.mod" }}-1
+        key: versions-postgres-{{ checksum "go.mod" }}
         paths:
         - /home/circleci/.go_workspace/pkg/mod
         - /home/circleci/.kube
@@ -198,7 +198,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-1
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
         name: Install curl, kind, kubectl, and helm
@@ -270,7 +270,7 @@ jobs:
 
     - restore_cache:
         keys:
-        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}-1
+        - ${CIRCLE_PROJECT_REPONAME}-{{ checksum "go.mod" }}
 
     - run:
         name: Build docker image
