@@ -21,7 +21,7 @@ jobs:
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
         IMAGE_NAME: ghcr.io/lord-y/versions/versions
-    - image: cimg/mariadb:10.6
+    - image: mariadb:10.7
       environment:
         MYSQL_DATABASE: versions
         MYSQL_USER: versions
@@ -77,6 +77,8 @@ jobs:
         name: Init DB
         command: |
           go run main.go &
+          pgrep main
+          ps auxwww |grep main.go
           sleep 20
           pgrep main |xargs -n1 -P1 kill
 
@@ -105,7 +107,7 @@ jobs:
         REDIS_ENABLED: "true"
         REDIS_URI: redis://:password@127.0.0.1:6379
         IMAGE_NAME: ghcr.io/lord-y/versions/versions
-    - image: cimg/postgres:14.1
+    - image: postgres:14
       environment:
         POSTGRES_DB: versions
         POSTGRES_USER: versions
