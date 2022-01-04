@@ -18,9 +18,8 @@
             class="block text-green-600 font-extrabold hover:text-white px-2 py-1 uppercase"
             to="/"
             :title="$t('brand.name')"
+            >{{ $t('brand.name') }}</router-link
           >
-            {{ $t('brand.name') }}
-          </router-link>
         </div>
         <div class="lg:hidden">
           <button
@@ -60,9 +59,8 @@
                 :class="getActiveLink('/dashboards/deployments')"
                 to="/dashboards/deployments"
                 :title="$t('dashboards.deployments')"
+                >{{ $t('dashboards.deployments') }}</router-link
               >
-                {{ $t('dashboards.deployments') }}
-              </router-link>
             </div>
           </div>
           <div v-if="workload.length > 0">
@@ -76,22 +74,12 @@
             </button>
             <template v-for="(w, index) in workload" :key="index">
               <div class="bg-black" v-if="menu.isOpen.platform">
-                <!-- <router-link
-                  class="block text-white hover:text-green-600 hover:font-extrabold p-2 uppercase"
-                  :class="getActiveLink('/executions/list')"
-                  to="/executions/list"
-                  :title="$t('executions.list')"
-                >
-                  {{ w }}
-                </router-link> -->
-                <router-link
+                <div
                   class="block font-extrabold p-2 uppercase"
                   :class="setWorkloadActiveLink('/workload/' + w)"
-                  :to="'/workload/' + w"
-                  :title="w"
                 >
                   {{ w }}
-                </router-link>
+                </div>
                 <template
                   v-for="(platform, indexWS) in filteredPlatformsByWorkload(w)"
                   :key="indexWS + platform + w"
@@ -106,9 +94,8 @@
                       "
                       :to="'/workload/' + w + '/platform/' + platform"
                       :title="platform"
+                      >{{ platform }}</router-link
                     >
-                      {{ platform }}
-                    </router-link>
                   </div>
                   <div
                     class="bg-black ml-8"
@@ -138,9 +125,8 @@
                         environment
                       "
                       :title="environment"
+                      >{{ environment }}</router-link
                     >
-                      {{ environment }}
-                    </router-link>
                   </div>
                 </template>
               </div>
