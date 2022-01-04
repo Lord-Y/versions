@@ -90,6 +90,8 @@ jobs:
         name: Print result of unit testing
         command: go tool cover -func=coverage.out
 
+    - setup_remote_docker
+
     - run:
         name: Build docker image
         command: |
@@ -173,6 +175,8 @@ jobs:
         name: Print result of unit testing
         command: go tool cover -func=coverage.out
 
+    - setup_remote_docker
+    
     - run:
         name: Build docker image
         command: |
