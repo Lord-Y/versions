@@ -5,7 +5,7 @@ FROM ${DOCKER_IMAGE_NODEJS} as buildernode
 RUN mkdir /app
 WORKDIR /app
 COPY ui .
-RUN rm -rf .git .env*
+RUN rm -rf .git .env* dist
 RUN apk update && apk upgrade
 RUN apk add --no-cache git curl && rm -rf /var/cache/apk/*
 RUN npm install
