@@ -3,7 +3,7 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    component: () => import('@/views/Contents.vue'),
+    component: () => import('@/views/contents/Contents.vue'),
     meta: {
       root: 'home',
       activeLink: '/',
@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/workload/:workload/platform/:platform',
-    component: () => import('@/views/Contents.vue'),
+    component: () => import('@/views/contents/Contents.vue'),
     meta: {
       menu: 'platform',
       root: 'platform',
@@ -49,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/workload/:workload/platform/:platform/:page',
-    component: () => import('@/views/Contents.vue'),
+    component: () => import('@/views/contents/Contents.vue'),
     meta: {
       menu: 'platform',
       root: 'platform',
@@ -64,7 +64,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/workload/:workload/platform/:platform/environment/:environment',
-    component: () => import('@/views/Contents.vue'),
+    component: () => import('@/views/contents/Contents.vue'),
     meta: {
       menu: 'platform',
       root: 'environment',
@@ -79,7 +79,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/workload/:workload/platform/:platform/environment/:environment/:page',
-    component: () => import('@/views/Contents.vue'),
+    component: () => import('@/views/contents/Contents.vue'),
     meta: {
       menu: 'platform',
       root: 'environment',
@@ -94,7 +94,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/workload/:workload/platform/:platform/environment/:environment/raw/:version',
-    component: () => import('@/views/Raw.vue'),
+    component: () => import('@/views/contents/Raw.vue'),
     meta: {
       root: 'raw',
     },
@@ -108,7 +108,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/raw/:version',
-    component: () => import('@/views/Raw.vue'),
+    component: () => import('@/views/contents/Raw.vue'),
     meta: {
       root: 'raw',
     },
