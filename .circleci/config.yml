@@ -76,7 +76,7 @@ jobs:
     - run:
         name: Init DB
         command: |
-          go run main.go &
+          go run main.go
           pgrep main
           ps auxwww |grep main.go
           sleep 20
