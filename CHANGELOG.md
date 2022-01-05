@@ -14,6 +14,17 @@ Initial release version
 - Fetch data
 - Add git hooks
 
+### Changed
+- Mergin versions and versions-api repositories into versions
+- Fix prerelease build
+
+## [v0.1.0-beta2](https://github.com/Lord-Y/versions/releases/tag/v0.1.0-beta1) - 2022-01-05
+
+Initial beta version
+
+### Changed
+- Fix prerelease build
+
 ## [v0.1.0-beta1](https://github.com/Lord-Y/versions/releases/tag/v0.1.0-beta1) - 2022-01-05
 
 Initial beta version
