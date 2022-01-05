@@ -246,7 +246,7 @@ jobs:
     - run:
         name: Deploy tagged build
         command: |
-          kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG}
+          for i in $(kind get nodes --name ${KIND_CLUSTER_NAME} |grep -v control-plane);do sudo kind load docker-image ${IMAGE_NAME}:${CIRCLE_TAG} --name ${KIND_CLUSTER_NAME} --nodes $i;done
           helm upgrade -i --create-namespace versions helm-charts/charts/versions --namespace ${NAMESPACE} -f .circleci/values.yaml --wait --kube-context kind-${KIND_CLUSTER_NAME} --set-string image.tag="$CIRCLE_TAG"
 
     - run:
