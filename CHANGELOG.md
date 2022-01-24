@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 UI
 
 ### Changed
-- Fix raw json display 
+- ui:
+  - Fix raw json display
+  - Update ui packages
 
 ## [v0.1.0](https://github.com/Lord-Y/versions/releases/tag/v0.1.0) - 2022-01-05
 
