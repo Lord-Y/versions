@@ -25,6 +25,10 @@ export interface Deployment {
 
 export type Deployments = Array<Deployment>
 
+export interface DeploymentRaw {
+  raw: string
+}
+
 export interface GenericObject {
   [key: string]: string | number | boolean
 }

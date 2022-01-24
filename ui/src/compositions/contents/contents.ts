@@ -84,27 +84,6 @@ export default function (
         page: page,
       }
       break
-    case 'raw':
-      state.meta.title =
-        t('deployments.platform') +
-        ' ' +
-        route.params.platform +
-        ' - ' +
-        t('deployments.environment').toLowerCase() +
-        ' ' +
-        route.params.environment +
-        ' - ' +
-        t('deployments.version').toLowerCase() +
-        ' ' +
-        route.params.version
-      state.meta.description = state.meta.title
-      getData = {
-        workload: route.params.workload,
-        platform: route.params.platform,
-        environment: route.params.environment,
-        version: route.params.version,
-      }
-      break
     default:
       state.meta.title = t('deployments.last')
       state.meta.description = t('deployments.last')

@@ -3,5 +3,5 @@ export interface configObject {
 }
 
 export const config = {
-  RANGE_LIMIT: process.env['RANGE_LIMIT'] || 25,
+  RANGE_LIMIT: 25,
 } as configObject

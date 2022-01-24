@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { toRefs } from 'vue'
-import contents from '@/compositions/contents/contents'
+import raw from '@/compositions/contents/raw'
 
 const props = defineProps({
   url: {
@@ -33,5 +33,5 @@ const props = defineProps({
 })
 
 const { url } = toRefs(props)
-const { deployments, responseStatus } = contents(url)
+const { deployments, responseStatus } = raw(url)
 </script>
