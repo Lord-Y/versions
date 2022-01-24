@@ -170,7 +170,7 @@ When you need to run both `ui` and `api` you need to open 2 shells:
 # api shell
 export SQL_DRIVER=postgres
 export DB_URI="postgres://USERNAME:PASSWORD@HOST:PORT/DB_NAME?sslmode=disable"
-export APP_PORT=80801
+export APP_PORT=8081
 go run main.go
 
 # ui shell
