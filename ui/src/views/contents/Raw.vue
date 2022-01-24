@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="responseStatus === 200">
-      <pre>{{ deployments }}</pre>
+      <pre>{{ deployments.raw }}</pre>
     </template>
     <template v-if="responseStatus === 204">
       <h2 class="text-center text-gray-400 text-xl font-semibold">
