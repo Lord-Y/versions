@@ -103,14 +103,18 @@ export default function (
     .catch((error: any) => {
       state.alert.class = 'red'
       state.alert.message = t('alert.http.errorOccured')
-      switch (error.response.status) {
-        case 404:
-        case 500:
-          state.responseStatus = error.response.status
-          break
-        default:
-          state.responseStatus = error.response.status
-          break
+      if (error.response && error.response.data) {
+        switch (error.response.status) {
+          case 404:
+          case 500:
+            state.responseStatus = error.response.status
+            break
+          default:
+            state.responseStatus = error.response.status
+            break
+        }
+      } else {
+        state.responseStatus = error.response.status
       }
       state.loading.loading.active = false
       throw error
