@@ -126,8 +126,8 @@ export default function (
               total = state.deployments[0].total
               if (total > config.RANGE_LIMIT) {
                 state.pagination.enabled = true
-                  ; (state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}`),
-                    (state.pagination.data.actualPage = page)
+                ;(state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}`),
+                  (state.pagination.data.actualPage = page)
                 state.pagination.data.total = total
                 state.pagination.enabled = true
               }
@@ -136,8 +136,8 @@ export default function (
               total = state.deployments[0].total
               if (total > config.RANGE_LIMIT) {
                 state.pagination.enabled = true
-                  ; (state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}/environment/${route.params.environment}/`),
-                    (state.pagination.data.actualPage = page)
+                ;(state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}/environment/${route.params.environment}/`),
+                  (state.pagination.data.actualPage = page)
                 state.pagination.data.total = total
                 state.pagination.enabled = true
               }
