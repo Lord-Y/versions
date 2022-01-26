@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="responseStatus === 200">
-      <pre>{{ deployments.raw }}</pre>
+      <pre>{{ isJSON(deployments.raw) }}</pre>
     </template>
     <template v-if="responseStatus === 204">
       <h2 class="text-center text-gray-400 text-xl font-semibold">
@@ -33,5 +33,5 @@ const props = defineProps({
 })
 
 const { url } = toRefs(props)
-const { deployments, responseStatus } = raw(url)
+const { deployments, responseStatus, isJSON } = raw(url)
 </script>

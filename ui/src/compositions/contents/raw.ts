@@ -116,7 +116,17 @@ export default function (
       throw error
     })
 
+  function isJSON(str: any): any {
+    const zz: string = str.replace(/\\"/g, '"')
+    try {
+      return JSON.stringify(JSON.parse(zz), null, 2)
+    } catch (e) {
+      return str
+    }
+  }
+
   return {
+    isJSON,
     ...toRefs(state),
   }
 }
