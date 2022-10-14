@@ -2,7 +2,6 @@ package routers
 
 import (
 	"embed"
-	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -46,7 +45,8 @@ func SetupRouter() *gin.Engine {
 		logger.SetLogger(
 			logger.WithUTC(true),
 			logger.WithLogger(
-				func(c *gin.Context, w io.Writer, d time.Duration) zerolog.Logger {
+				func(c *gin.Context, l zerolog.Logger) zerolog.Logger {
+					var d time.Duration
 					return zerolog.New(os.Stdout).
 						With().
 						Timestamp().
