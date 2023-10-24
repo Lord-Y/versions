@@ -15,8 +15,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/golang-migrate/migrate/v4/source/httpfs"
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -57,15 +56,11 @@ func InitDB(source embed.FS) {
 		driver,
 	)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Migration failed: %s", err.Error())
-		return
-	}
-	if err != nil {
-		log.Fatal().Err(err).Msgf("Migration failed: %s", err.Error())
+		log.Fatal().Err(err).Msg("An error occured while configuring database instance")
 		return
 	}
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal().Err(err).Msgf("An error occurred while syncing the database with error msg: %s", err.Error())
+		log.Fatal().Err(err).Msg("An error occurred while upgrading the database schema")
 		return
 	}
 	defer db.Close()
@@ -94,11 +89,11 @@ func Ping() (b bool) {
 // Create permit to insert data into sql instance
 func Create(d models.Create) (z int64, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
@@ -129,11 +124,11 @@ func Create(d models.Create) (z int64, err error) {
 // UpdateStatus permit to insert data into sql instance
 func UpdateStatus(d models.UpdateStatus) (err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
@@ -157,11 +152,11 @@ func UpdateStatus(d models.UpdateStatus) (err error) {
 // ReadEnvironment permit to get data into sql instance
 func ReadEnvironment(d models.ReadEnvironment) (z []models.DBReadCommon, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	rows, err := db.Query(
 		ctx,
@@ -201,11 +196,11 @@ func ReadEnvironment(d models.ReadEnvironment) (z []models.DBReadCommon, err err
 // ReadEnvironmentLatest permit to get latest version with status deployed or completed
 func ReadEnvironmentLatest(d models.ReadEnvironmentLatest) (z models.DbVersion, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	var query string
 	if d.Whatever {
@@ -232,11 +227,11 @@ func ReadEnvironmentLatest(d models.ReadEnvironmentLatest) (z models.DbVersion, 
 // ReadPlatform permit to get data into sql instance
 func ReadPlatform(d models.ReadPlatform) (z []models.DBReadCommon, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	rows, err := db.Query(
 		ctx,
@@ -275,11 +270,11 @@ func ReadPlatform(d models.ReadPlatform) (z []models.DBReadCommon, err error) {
 // ReadHome permit to get data into sql instance
 func ReadHome() (z []models.DBCommons, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	rows, err := db.Query(
 		ctx,
@@ -313,11 +308,11 @@ func ReadHome() (z []models.DBCommons, err error) {
 // ReadDistinctWorkloads permit to get data into sql instance
 func ReadDistinctWorkloads() (z []models.DBReadDistinctWorkloads, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	rows, err := db.Query(
 		ctx,
@@ -345,11 +340,11 @@ func ReadDistinctWorkloads() (z []models.DBReadDistinctWorkloads, err error) {
 // Raw permit to get data from raw column instance
 func Raw(d models.Raw) (z models.DBRaw, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	err = db.QueryRow(
 		ctx,
@@ -369,11 +364,11 @@ func Raw(d models.Raw) (z models.DBRaw, err error) {
 // RawById permit to get data from raw by version_id column instance
 func RawById(d models.RawById) (z models.DBCommons, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	err = db.QueryRow(
 		ctx,
@@ -398,11 +393,11 @@ func RawById(d models.RawById) (z models.DBCommons, err error) {
 
 func ReadForUnitTesting(status string) (z models.DBCommons, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	err = db.QueryRow(
 		ctx,
@@ -428,11 +423,11 @@ func ReadForUnitTesting(status string) (z models.DBCommons, err error) {
 // GetLastXDaysDeployments permit to get data into sql instance
 func GetLastXDaysDeployments() (z []models.DBGetLastXDaysDeployments, err error) {
 	ctx := context.Background()
-	db, err := pgxpool.Connect(ctx, commons.BuildDSN())
+	db, err := pgx.Connect(ctx, commons.BuildDSN())
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer db.Close(ctx)
 
 	rows, err := db.Query(
 		ctx,
