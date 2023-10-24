@@ -55,11 +55,11 @@ func InitDB(source embed.FS) {
 		driver,
 	)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("Migration failed: %s", err.Error())
+		log.Fatal().Err(err).Msg("An error occured while configuring database instance")
 		return
 	}
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal().Err(err).Msgf("An error occurred while syncing the database with error msg: %s", err.Error())
+		log.Fatal().Err(err).Msg("An error occurred while upgrading the database schema")
 		return
 	}
 	defer db.Close()
