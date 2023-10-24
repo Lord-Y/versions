@@ -1,5 +1,5 @@
-ARG DOCKER_IMAGE_NODEJS="node:14-alpine"
-ARG DOCKER_IMAGE_GOLANG="golang:1.17-alpine"
+ARG DOCKER_IMAGE_NODEJS="node:16-alpine"
+ARG DOCKER_IMAGE_GOLANG="golang:1.21.3-alpine"
 
 FROM ${DOCKER_IMAGE_NODEJS} as buildernode
 RUN mkdir /app
