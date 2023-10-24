@@ -133,6 +133,10 @@ Golang metrics are built-in in our API.
 
 We also add last 10 days deployments by status on `curl 0:8080/api/v1/stats/latest` but also on `curl 0:9101/metrics |grep versions_last_deployments_by_status`
 
+## Enable logging on health(z) paths
+
+To enable logging on health(z) path, set environment variable to any value for example: `APP_SKIP_PATH_DISABLED=true`.
+
 ## What does it looks like
 
 The home page show you the last deployments from all workloads:
