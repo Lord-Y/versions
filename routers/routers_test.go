@@ -104,6 +104,8 @@ func TestHealth_prometheus(t *testing.T) {
 
 	os.Setenv("APP_PROMETHEUS", "1")
 	defer os.Unsetenv("APP_PROMETHEUS")
+	os.Setenv("APP_SKIP_PATH_DISABLED", "1")
+	defer os.Unsetenv("APP_SKIP_PATH_DISABLED")
 	router := SetupRouter()
 	w, err := performRequest(router, headers, "GET", "/api/v1/health", "")
 	if err != nil {

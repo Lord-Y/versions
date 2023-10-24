@@ -5,7 +5,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
-	"time"
+	"strings"
 
 	"github.com/Lord-Y/versions/health"
 	customLogger "github.com/Lord-Y/versions/logger"
@@ -41,21 +41,24 @@ func SetupRouter() *gin.Engine {
 	router.Use(gin.Recovery())
 	router.RedirectTrailingSlash = true
 
+	skipPath := []string{
+		"/api/v1/health",
+		"/api/v1/healthz",
+	}
+
+	if strings.TrimSpace(os.Getenv("APP_SKIP_PATH_DISABLED")) != "" {
+		skipPath = []string{}
+	}
+
 	router.Use(
 		logger.SetLogger(
+			logger.WithSkipPath(skipPath),
 			logger.WithUTC(true),
 			logger.WithLogger(
 				func(c *gin.Context, l zerolog.Logger) zerolog.Logger {
-					var d time.Duration
 					return zerolog.New(os.Stdout).
 						With().
 						Timestamp().
-						Int("status", c.Writer.Status()).
-						Str("method", c.Request.Method).
-						Str("path", c.Request.URL.Path).
-						Str("ip", c.ClientIP()).
-						Dur("latency", d).
-						Str("user_agent", c.Request.UserAgent()).
 						Logger()
 				},
 			),
@@ -63,7 +66,7 @@ func SetupRouter() *gin.Engine {
 	)
 
 	// disable during unit testing
-	if os.Getenv("APP_PROMETHEUS") != "" {
+	if strings.TrimSpace(os.Getenv("APP_PROMETHEUS")) != "" {
 		p := ginprometheus.NewPrometheus("http")
 		p.SetListenAddressWithRouter(":9101", router)
 		p.Use(router)
