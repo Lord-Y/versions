@@ -66,23 +66,26 @@ func init() {
 }
 
 func main() {
-	var srv *http.Server
+	var appPort string
 	router := routers.SetupRouter()
-	appPort := strings.TrimSpace(os.Getenv("APP_PORT"))
-	if appPort != "" {
-		srv = &http.Server{
-			Addr:    fmt.Sprintf(":%s", appPort),
-			Handler: router,
+	port := strings.TrimSpace(os.Getenv("APP_PORT"))
+
+	switch strings.HasPrefix(port, ":") {
+	case true:
+		appPort = port
+	case false:
+		if port == "" {
+			appPort = ":8080"
+		} else {
+			appPort = fmt.Sprintf(":%s", port)
 		}
-		log.Info().Msgf("Starting server on port %s", appPort)
-	} else {
-		appPort = ":8080"
-		srv = &http.Server{
-			Addr:    appPort,
-			Handler: router,
-		}
-		log.Info().Msgf("Starting server on port %s", appPort)
 	}
+
+	srv := &http.Server{
+		Addr:    appPort,
+		Handler: router,
+	}
+	log.Info().Msgf("Starting server on port %s", appPort)
 
 	go func() {
 		// service connections
