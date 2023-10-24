@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from 'axios'
 
 const axiosClient: AxiosInstance = axios.create({
   headers: {
-    'Content-type': 'application/json',
+    'Content-Type': 'application/json',
   },
 })
 

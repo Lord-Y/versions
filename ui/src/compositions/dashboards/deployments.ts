@@ -1,7 +1,7 @@
 import { reactive, toRefs, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHead } from '@vueuse/head'
-import { StatsLatest, BarData, dataset } from '@/apis/interfaces'
+import type { StatsLatest, BarData, dataset } from '@/apis/interfaces'
 import axiosService from '@/apis/axiosService'
 import moment from 'moment'
 
@@ -32,7 +32,6 @@ export default function (
     barData: {} as BarData,
     options: {
       indexAxis: 'y',
-
       responsive: true,
       plugins: {
         legend: {
@@ -95,7 +94,11 @@ export default function (
       switch (response.status) {
         case 200:
           state.statsLatest = response.data
-          state.statsLatest.forEach((k) => {
+          state.statsLatest.forEach((k, index) => {
+            if (index == 0) {
+              state.barData.labels = []
+              state.barData.datasets = []
+            }
             const label: string =
               t('deployments.workload').toLowerCase() +
               ' ' +
@@ -113,7 +116,6 @@ export default function (
               ' ' +
               moment(k.date).format('LL')
             state.barData.labels.push(label)
-
             data.push(k.total)
             dataset.label = t('deployments.details')
             backgroundColor.push(generateRandomColor())

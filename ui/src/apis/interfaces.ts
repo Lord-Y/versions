@@ -52,14 +52,13 @@ export interface StatLatest {
 
 export type StatsLatest = Array<StatLatest>
 
-export interface BarData {
-  labels: Array<string>
-  datasets: dataset[]
-}
-
 export interface dataset {
   label: string
   data: Array<number>
   backgroundColor: Array<string>
-  // borderColor: string
+}
+
+export interface BarData {
+  labels: string[]
+  datasets: dataset[]
 }
