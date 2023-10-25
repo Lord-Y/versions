@@ -6,54 +6,37 @@
           <div class="disabled">
             <router-link
               class="cursor-default pointer-events-none rounded rounded-r-none py-2 px-3 border border-gray-300 text-gray-600"
-              to="#"
-              :title="$t('pagination.begin')"
-            >
+              to="#" :title="$t('pagination.begin')">
               {{ $t('pagination.begin') }}
             </router-link>
           </div>
           <div class="disabled">
-            <router-link
-              class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600"
-              to="#"
-              :title="$t('pagination.previous')"
-            >
+            <router-link class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600" to="#"
+              :title="$t('pagination.previous')">
               {{ $t('pagination.previous') }}
             </router-link>
           </div>
           <div class="bg-green-700">
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-white bg-green-700"
-              :to="paginationUrl + '1'"
-              title="1"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-white bg-green-700" :to="paginationUrl + '1'"
+              title="1">
               1
             </router-link>
           </div>
           <div>
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + '2'"
-              title="2"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + '2'" title="2">
               2
             </router-link>
           </div>
           <div>
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + '2'"
-              :title="$t('pagination.next')"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + '2'" :title="$t('pagination.next')">
               {{ $t('pagination.next') }}
             </router-link>
           </div>
           <div>
-            <router-link
-              class="rounded rounded-l-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + ceil"
-              :title="$t('pagination.end')"
-            >
+            <router-link class="rounded rounded-l-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + ceil" :title="$t('pagination.end')">
               {{ $t('pagination.end') }}
             </router-link>
           </div>
@@ -62,63 +45,43 @@
           <div class="disabled">
             <router-link
               class="cursor-default pointer-events-none rounded rounded-r-none py-2 px-3 border border-gray-300 text-gray-600"
-              to="#"
-              :title="$t('pagination.begin')"
-            >
+              to="#" :title="$t('pagination.begin')">
               {{ $t('pagination.begin') }}
             </router-link>
           </div>
           <div class="disabled">
-            <router-link
-              class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600"
-              to="#"
-              :title="$t('pagination.previous')"
-            >
+            <router-link class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600" to="#"
+              :title="$t('pagination.previous')">
               {{ $t('pagination.previous') }}
             </router-link>
           </div>
           <div class="bg-green-700">
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-white bg-green-700"
-              :to="paginationUrl + '1'"
-              title="1"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-white bg-green-700" :to="paginationUrl + '1'"
+              title="1">
               1
             </router-link>
           </div>
           <div>
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + '2'"
-              title="2"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + '2'" title="2">
               2
             </router-link>
           </div>
           <div>
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + '3'"
-              title="3"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + '3'" title="3">
               3
             </router-link>
           </div>
           <div>
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + '2'"
-              :title="$t('pagination.next')"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + '2'" :title="$t('pagination.next')">
               {{ $t('pagination.next') }}
             </router-link>
           </div>
           <div>
-            <router-link
-              class="rounded py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + ceil"
-              :title="$t('pagination.end')"
-            >
+            <router-link class="rounded py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + ceil" :title="$t('pagination.end')">
               {{ $t('pagination.end') }}
             </router-link>
           </div>
@@ -127,65 +90,45 @@
       <template v-else>
         <template v-if="actualPage === ceil">
           <div>
-            <router-link
-              class="rounded rounded-r-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + '1'"
-              :title="$t('pagination.begin')"
-            >
+            <router-link class="rounded rounded-r-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + '1'" :title="$t('pagination.begin')">
               {{ $t('pagination.begin') }}
             </router-link>
           </div>
           <div>
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + previous"
-              :title="$t('pagination.previous')"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + previous" :title="$t('pagination.previous')">
               {{ $t('pagination.previous') }}
             </router-link>
           </div>
           <div v-if="ceil > 2">
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + (previous - 1)"
-              :title="previous - 1"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + (previous - 1)" :title="previous - 1">
               {{ previous - 1 }}
             </router-link>
           </div>
           <div>
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-              :to="paginationUrl + previous"
-              :title="previous"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+              :to="paginationUrl + previous" :title="previous">
               {{ previous }}
             </router-link>
           </div>
           <div class="bg-green-700">
-            <router-link
-              class="py-2 px-3 border border-gray-300 text-white bg-green-700"
-              :to="paginationUrl + pagination.actualPage"
-              :title="pagination.actualPage"
-            >
+            <router-link class="py-2 px-3 border border-gray-300 text-white bg-green-700"
+              :to="paginationUrl + pagination.actualPage" :title="pagination.actualPage">
               {{ pagination.actualPage }}
             </router-link>
           </div>
           <div class="disabled">
-            <router-link
-              class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600"
-              :to="paginationUrl + next"
-              :title="$t('pagination.next')"
-            >
+            <router-link class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600"
+              :to="paginationUrl + next" :title="$t('pagination.next')">
               {{ $t('pagination.next') }}
             </router-link>
           </div>
           <div class="disabled">
             <router-link
               class="cursor-default pointer-events-none rounded rounded-l-none py-2 px-3 border border-gray-300 text-gray-600"
-              :to="paginationUrl + ceil"
-              :title="$t('pagination.end')"
-            >
+              :to="paginationUrl + ceil" :title="$t('pagination.end')">
               {{ $t('pagination.end') }}
             </router-link>
           </div>
@@ -195,36 +138,25 @@
             <div>
               <router-link
                 class="rounded rounded-r-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                :to="paginationUrl + '1'"
-                :title="$t('pagination.begin')"
-              >
+                :to="paginationUrl + '1'" :title="$t('pagination.begin')">
                 {{ $t('pagination.begin') }}
               </router-link>
             </div>
             <div>
-              <router-link
-                class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                :to="paginationUrl + previous"
-                :title="$t('pagination.previous')"
-              >
+              <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                :to="paginationUrl + previous" :title="$t('pagination.previous')">
                 {{ $t('pagination.previous') }}
               </router-link>
             </div>
             <div>
-              <router-link
-                class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                :to="paginationUrl + previous"
-                :title="$t('pagination.previous')"
-              >
+              <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                :to="paginationUrl + previous" :title="$t('pagination.previous')">
                 {{ previous }}
               </router-link>
             </div>
             <div class="bg-green-700">
-              <router-link
-                class="py-2 px-3 border border-gray-300 text-white bg-green-700"
-                :to="paginationUrl + pagination.actualPage"
-                :title="pagination.actualPage"
-              >
+              <router-link class="py-2 px-3 border border-gray-300 text-white bg-green-700"
+                :to="paginationUrl + pagination.actualPage" :title="pagination.actualPage">
                 {{ pagination.actualPage }}
               </router-link>
             </div>
@@ -232,47 +164,34 @@
               <div class="disabled">
                 <router-link
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600 hover:bg-gray-300"
-                  :to="paginationUrl + next"
-                  :title="$t('pagination.next')"
-                >
+                  :to="paginationUrl + next" :title="$t('pagination.next')">
                   {{ $t('pagination.next') }}
                 </router-link>
               </div>
               <div class="disabled">
                 <router-link
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-gray-600 hover:bg-gray-300"
-                  :to="paginationUrl + ceil"
-                  :title="$t('pagination.end')"
-                >
+                  :to="paginationUrl + ceil" :title="$t('pagination.end')">
                   {{ $t('pagination.end') }}
                 </router-link>
               </div>
             </template>
             <template v-else>
               <div>
-                <router-link
-                  class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + next"
-                  :title="next"
-                >
+                <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                  :to="paginationUrl + next" :title="next">
                   {{ next }}
                 </router-link>
               </div>
               <div>
-                <router-link
-                  class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + next"
-                  :title="$t('pagination.next')"
-                >
+                <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                  :to="paginationUrl + next" :title="$t('pagination.next')">
                   {{ $t('pagination.next') }}
                 </router-link>
               </div>
               <div>
-                <router-link
-                  class="rounded py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + ceil"
-                  :title="$t('pagination.end')"
-                >
+                <router-link class="rounded py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                  :to="paginationUrl + ceil" :title="$t('pagination.end')">
                   {{ $t('pagination.end') }}
                 </router-link>
               </div>
@@ -283,18 +202,14 @@
               <div class="disabled">
                 <router-link
                   class="cursor-default pointer-events-none rounded rounded-r-none py-2 px-3 border border-gray-300 text-gray-600"
-                  :to="paginationUrl + '1'"
-                  :title="$t('pagination.begin')"
-                >
+                  :to="paginationUrl + '1'" :title="$t('pagination.begin')">
                   {{ $t('pagination.begin') }}
                 </router-link>
               </div>
               <div class="disabled">
                 <router-link
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + previous"
-                  :title="$t('pagination.previous')"
-                >
+                  :to="paginationUrl + previous" :title="$t('pagination.previous')">
                   {{ $t('pagination.previous') }}
                 </router-link>
               </div>
@@ -303,46 +218,32 @@
               <div>
                 <router-link
                   class="rounded rounded-r-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + '1'"
-                  :title="$t('pagination.begin')"
-                >
+                  :to="paginationUrl + '1'" :title="$t('pagination.begin')">
                   {{ $t('pagination.begin') }}
                 </router-link>
               </div>
               <div>
-                <router-link
-                  class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + previous"
-                  :title="$t('pagination.previous')"
-                >
+                <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                  :to="paginationUrl + previous" :title="$t('pagination.previous')">
                   {{ $t('pagination.previous') }}
                 </router-link>
               </div>
             </template>
             <div v-if="actualPage === ceil">
-              <router-link
-                class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                :to="paginationUrl + (previous - 1)"
-                :title="previous - 1"
-              >
+              <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                :to="paginationUrl + (previous - 1)" :title="previous - 1">
                 {{ previous - 1 }}
               </router-link>
             </div>
             <div v-if="previous > 0">
-              <router-link
-                class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                :to="paginationUrl + previous"
-                :title="previous"
-              >
+              <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                :to="paginationUrl + previous" :title="previous">
                 {{ previous }}
               </router-link>
             </div>
             <div class="bg-green-700">
-              <router-link
-                class="py-2 px-3 border border-gray-300 text-white bg-green-700"
-                :to="paginationUrl + pagination.actualPage"
-                :title="pagination.actualPage"
-              >
+              <router-link class="py-2 px-3 border border-gray-300 text-white bg-green-700"
+                :to="paginationUrl + pagination.actualPage" :title="pagination.actualPage">
                 {{ pagination.actualPage }}
               </router-link>
             </div>
@@ -350,56 +251,41 @@
               <div class="disabled">
                 <router-link
                   class="cursor-default pointer-events-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + next"
-                  :title="$t('pagination.next')"
-                >
+                  :to="paginationUrl + next" :title="$t('pagination.next')">
                   {{ $t('pagination.next') }}
                 </router-link>
               </div>
               <div class="disabled">
                 <router-link
                   class="cursor-default pointer-events-none rounded rounded-l-none py-2 px-3 border border-gray-300 text-gray-600"
-                  :to="paginationUrl + ceil"
-                  :title="$t('pagination.end')"
-                >
+                  :to="paginationUrl + ceil" :title="$t('pagination.end')">
                   {{ $t('pagination.end') }}
                 </router-link>
               </div>
             </template>
             <template v-else>
               <div>
-                <router-link
-                  class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + next"
-                  :title="next"
-                >
+                <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                  :to="paginationUrl + next" :title="next">
                   {{ next }}
                 </router-link>
               </div>
               <div v-if="actualPage === 1">
-                <router-link
-                  class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + (next + 1)"
-                  :title="next + 1"
-                >
+                <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                  :to="paginationUrl + (next + 1)" :title="next + 1">
                   {{ next + 1 }}
                 </router-link>
               </div>
               <div>
-                <router-link
-                  class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + next"
-                  :title="$t('pagination.next')"
-                >
+                <router-link class="py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
+                  :to="paginationUrl + next" :title="$t('pagination.next')">
                   {{ $t('pagination.next') }}
                 </router-link>
               </div>
               <div>
                 <router-link
                   class="rounded rounded-l-none py-2 px-3 border border-gray-300 text-green-600 hover:bg-gray-300"
-                  :to="paginationUrl + ceil"
-                  :title="$t('pagination.end')"
-                >
+                  :to="paginationUrl + ceil" :title="$t('pagination.end')">
                   {{ $t('pagination.end') }}
                 </router-link>
               </div>
@@ -412,8 +298,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, PropType } from 'vue'
-import { Pagination } from '@/apis/interfaces'
+import { computed } from 'vue'
+import type { PropType } from 'vue'
+import type { Pagination } from '@/apis/interfaces'
 import { config } from '@/apis/configs'
 
 const props = defineProps({

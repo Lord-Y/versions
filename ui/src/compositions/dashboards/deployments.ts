@@ -1,7 +1,8 @@
-import { reactive, toRefs, Ref } from 'vue'
+import { reactive, toRefs } from 'vue'
+import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHead } from '@vueuse/head'
-import type { StatsLatest, BarData, dataset } from '@/apis/interfaces'
+import type { StatsLatest, Options } from '@/apis/interfaces'
 import axiosService from '@/apis/axiosService'
 import moment from 'moment'
 
@@ -29,19 +30,10 @@ export default function (
     classes: {
       aLinks: 'hover:text-green-600 hover:font-extrabold',
     },
-    barData: {} as BarData,
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-        },
-        title: {
-          display: false,
-          text: 'Chart.js Horizontal Bar Chart',
-        },
-      },
+    dashboards: {
+      data: [] as (string | number | object)[][],
+      options: {} as Options,
+      color: '#002877'
     },
   })
 
@@ -84,21 +76,12 @@ export default function (
       {},
     )
     .then((response: any) => {
-      const data: Array<number> = []
-      const backgroundColor: Array<string> = []
-      const dataset: dataset = {
-        label: '',
-        data: [],
-        backgroundColor: [],
-      }
       switch (response.status) {
         case 200:
           state.statsLatest = response.data
-          state.statsLatest.forEach((k, index) => {
-            if (index == 0) {
-              state.barData.labels = []
-              state.barData.datasets = []
-            }
+          state.dashboards.data.push([t('deployments.workload'), t('deployments.details'), { role: 'style' }])
+          state.statsLatest.forEach((k) => {
+            const datan = [] as (string | number | object)[]
             const label: string =
               t('deployments.workload').toLowerCase() +
               ' ' +
@@ -115,14 +98,12 @@ export default function (
               t('deployments.date').toLowerCase() +
               ' ' +
               moment(k.date).format('LL')
-            state.barData.labels.push(label)
-            data.push(k.total)
-            dataset.label = t('deployments.details')
-            backgroundColor.push(generateRandomColor())
+            datan.push(label)
+            datan.push(k.total)
+            datan.push(generateRandomColor())
+            state.dashboards.data.push(datan)
           })
-          dataset.data = data
-          dataset.backgroundColor = backgroundColor
-          state.barData.datasets.push(dataset)
+          state.dashboards.options.height = 700
           break
         case 204:
           state.alert.class = 'mute'

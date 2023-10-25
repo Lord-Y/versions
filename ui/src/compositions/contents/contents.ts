@@ -1,8 +1,9 @@
-import { reactive, toRefs, Ref } from 'vue'
+import { reactive, toRefs } from 'vue'
+import type { Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useHead } from '@vueuse/head'
-import { Deployments, GenericObject } from '@/apis/interfaces'
+import type { Deployments, GenericObject } from '@/apis/interfaces'
 import axiosService from '@/apis/axiosService'
 import { config } from '@/apis/configs'
 
@@ -126,8 +127,8 @@ export default function (
               total = state.deployments[0].total
               if (total > config.RANGE_LIMIT) {
                 state.pagination.enabled = true
-                ;(state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}`),
-                  (state.pagination.data.actualPage = page)
+                  ; (state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}`),
+                    (state.pagination.data.actualPage = page)
                 state.pagination.data.total = total
                 state.pagination.enabled = true
               }
@@ -136,8 +137,8 @@ export default function (
               total = state.deployments[0].total
               if (total > config.RANGE_LIMIT) {
                 state.pagination.enabled = true
-                ;(state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}/environment/${route.params.environment}/`),
-                  (state.pagination.data.actualPage = page)
+                  ; (state.pagination.data.url = `/workload/${route.params.workload}/platform/${route.params.platform}/environment/${route.params.environment}/`),
+                    (state.pagination.data.actualPage = page)
                 state.pagination.data.total = total
                 state.pagination.enabled = true
               }

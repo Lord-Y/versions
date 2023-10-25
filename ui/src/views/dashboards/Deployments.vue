@@ -6,8 +6,11 @@
         <TitleVue :title="meta.title" />
         <SpinnerCommon v-if="loading.loading.active" />
         <AlertMessage :message="alert.message" :classes="alert.class" />
-        <div class="mx-auto px-3 mt-20 w-full" v-if="barData">
-          <BarChart :chart-data="barData" :options="options" />
+        <div class="mx-auto px-3 w-full" v-if="dashboards">
+          <GChart type="BarChart" :data="dashboards.data
+            " :options="dashboards.options
+    " />
+          <!-- <pre>dashboards {{ dashboards }}</pre> -->
         </div>
       </div>
     </div>
@@ -21,25 +24,7 @@ import TitleVue from '@/components/commons/Title.vue'
 import SpinnerCommon from '@/components/commons/SpinnerCommon.vue'
 import dashboardsDeployments from '@/compositions/dashboards/deployments'
 import AlertMessage from '@/components/commons/AlertMessage.vue'
-// https://www.chartjs.org/docs/master/getting-started/integration.html#bundlers-webpack-rollup-etc
-import { BarChart } from 'vue-chart-3'
-import {
-  Chart,
-  BarController,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-} from 'chart.js'
-Chart.register(
-  BarController,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-)
+import { GChart } from 'vue-google-charts'
 
 const props = defineProps({
   url: {
@@ -49,5 +34,5 @@ const props = defineProps({
 })
 
 const { url } = toRefs(props)
-const { meta, loading, alert, barData, options } = dashboardsDeployments(url)
+const { meta, loading, alert, dashboards } = dashboardsDeployments(url)
 </script>

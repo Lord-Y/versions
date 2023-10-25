@@ -1,6 +1,6 @@
 import { reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
-import { Workloads } from '@/apis/interfaces'
+import type { Workloads } from '@/apis/interfaces'
 import axiosService from '@/apis/axiosService'
 
 export default function () {

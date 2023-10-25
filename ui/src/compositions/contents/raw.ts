@@ -1,8 +1,9 @@
-import { reactive, toRefs, Ref } from 'vue'
+import { reactive, toRefs } from 'vue'
+import type { Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useHead } from '@vueuse/head'
-import { DeploymentRaw } from '@/apis/interfaces'
+import type { DeploymentRaw } from '@/apis/interfaces'
 import axiosService from '@/apis/axiosService'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

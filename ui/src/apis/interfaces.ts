@@ -26,7 +26,7 @@ export interface Deployment {
 export type Deployments = Array<Deployment>
 
 export interface DeploymentRaw {
-  raw: string
+  raw: object
 }
 
 export interface GenericObject {
@@ -52,13 +52,12 @@ export interface StatLatest {
 
 export type StatsLatest = Array<StatLatest>
 
-export interface dataset {
-  label: string
-  data: Array<number>
-  backgroundColor: Array<string>
+export interface Series {
+  color: string
 }
 
-export interface BarData {
-  labels: string[]
-  datasets: dataset[]
+export interface Options {
+  series: Series[]
+  title: string
+  height: number
 }
