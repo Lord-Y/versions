@@ -1,48 +1,48 @@
 {
-    "brand": {
-      "name": "versions"
-    },
-    "home": {
-      "home": "Home"
-    },
-    "dashboards": {
-      "dashboards": "Dashboards",
-      "deployments": "Deployments"
-    },
-    "deployments": {
-      "last": "Last deployments",
-      "workload": "Workload | Workloads",
-      "platform": "Platform",
-      "environment": "Environment",
-      "version": "Version",
-      "changelog": "Changelog",
-      "raw": "Raw",
-      "status": "Status",
-      "date": "Date",
-      "notApplicable": "N/A",
-      "details": "Deployments details"
-    },
-    "alert": {
-      "http": {
-        "errorOccured": "An error occured, please try later",
-        "noDataFound": "No data found",
-        "internalServerError": "Internal server error",
-        "pageNotFound": "Page not found",
-        "noDeployment": "So far no deployment has been registered"
-      }
-    },
-    "pagination": {
-      "begin": "Beginning",
-      "previous": "Previous",
-      "next": "Next",
-      "end": "End"
-    },
-    "click": {
-      "moreDetails": "Click here for more details",
-      "changelog": "Click here to see changelog"
-    },
-    "statistics": {
-        "statistics": "Statistics",
-        "latest": "Last {field} days deployments"
+  "brand": {
+    "name": "versions"
+  },
+  "home": {
+    "home": "Home"
+  },
+  "dashboards": {
+    "dashboards": "Dashboards",
+    "deployments": "Deployments"
+  },
+  "deployments": {
+    "last": "Last deployments",
+    "workload": "Workload | Workloads",
+    "platform": "Platform",
+    "environment": "Environment",
+    "version": "Version",
+    "changelog": "Changelog",
+    "raw": "Raw",
+    "status": "Status",
+    "date": "Date",
+    "notApplicable": "N/A",
+    "details": "Deployments details"
+  },
+  "alert": {
+    "http": {
+      "errorOccured": "An error occured, please try later",
+      "noDataFound": "No data found",
+      "internalServerError": "Internal server error",
+      "pageNotFound": "Page not found",
+      "noDeployment": "So far no deployment has been registered"
     }
+  },
+  "pagination": {
+    "begin": "Beginning",
+    "previous": "Previous",
+    "next": "Next",
+    "end": "End"
+  },
+  "click": {
+    "moreDetails": "Click here for more details",
+    "changelog": "Click here to see changelog"
+  },
+  "statistics": {
+    "statistics": "Statistics",
+    "latest": "Last {field} days deployments"
   }
+}
