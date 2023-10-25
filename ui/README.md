@@ -1,6 +1,6 @@
-# versions
+# ui
 
-Versions stand to expose on the UI what we get from `versions-api`.
+`UI` expose what we get from `versions` `api`.
 
 ## Project setup
 ```
@@ -11,21 +11,7 @@ npm install
 ```
 export BASE_URL=http://localhost:8080
 export API_URL=http://localhost:8081
-npm run ssr:serve
-```
-
-### Tailwindcss
-
-If you want to regenerate css file `public/statics/assets/css/css.css`, you can run `npm run tailwind`
-
-### Compiles and minifies for production
-```
-npm run ssr:build
-```
-
-### Start the application
-```
-npm run ssr:start
+npm run dev
 ```
 
 ### Update package
