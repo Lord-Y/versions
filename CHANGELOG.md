@@ -4,8 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.2.0](https://github.com/Lord-Y/versions/releases/tag/v0.1.3) - 2022-10-14
+## [v0.2.0-beta1](https://github.com/Lord-Y/versions/releases/tag/v0.2.0-beta1) - 2023-10-25
 
+### Changed
+- ui:
+  - Upgrade to last stable version of vite/vue
+  - Update tailwindcss config
+  - Improve config management for i18n and linting json translation
+  - Typing interfaces import and lint code for *.vue and *.ts files
+- api:
+  - upgrade to golang 1.21.3
+  - Update db connection management for postgres
+  - Update wording for mysql and postgres
+  - Add config to prevent health(z) path logging
+  - Improve Dockerfile
+- ci:
+  - Update config
 
 ### Changed
 - ui:
