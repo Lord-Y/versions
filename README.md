@@ -183,6 +183,12 @@ export API_GATEWAY=http://127.0.0.1:8081
 npm run dev
 ```
 
-## TODO
+## Docker
 
-Use [vue-google-charts](https://github.com/devstark-com/vue-google-charts) when it will be compatible with Vue 3.
+Once everything is working, you can test the result in docker:
+```bash
+sudo docker build -t versions:latest .
+
+MY_LOCAL_IP=192.168.1.15 # for example
+sudo docker run --rm -e SQL_DRIVER=postgres -e DB_URI="postgres://versions:versions@${MY_LOCAL_IP}:5432/versions?sslmode=disable" -p 8080:8080 docker.io/library/versions:latest
+```
