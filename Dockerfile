@@ -1,4 +1,4 @@
-ARG DOCKER_IMAGE_NODEJS="node:16-alpine"
+ARG DOCKER_IMAGE_NODEJS="node:18-alpine"
 ARG DOCKER_IMAGE_GOLANG="golang:1.21.3-alpine"
 
 FROM ${DOCKER_IMAGE_NODEJS} as buildernode
@@ -19,12 +19,7 @@ WORKDIR $GOPATH/src/
 RUN rm -rf ui/dist routers/ui/dist
 COPY --from=buildernode /app/dist ui/dist
 COPY --from=buildernode /app/dist routers/ui/dist
-RUN rm -rf $GOPATH/pkg/* $GOPATH/src/go.sum $GOPATH/.git /var/cache/apk/*
-ENV GOBIN=$GOPATH/bin
-ENV PATH=$GOBIN:$PATH
-ENV GO111MODULE=on
-RUN go env -w GOFLAGS=-mod=mod
-RUN go env
+RUN rm -rf $GOPATH/pkg/* $GOPATH/.git /var/cache/apk/*
 RUN go mod download
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install -a -tags netgo -ldflags '-w -extldflags "-static"' .
