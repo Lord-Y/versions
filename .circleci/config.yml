@@ -9,12 +9,12 @@ version: 2.1
 executors:
   golang:
     machine:
-      image: ubuntu-2004:202111-01
+      image: ubuntu-2204:2023.10.1
 
 jobs:
   mariadb:
     docker:
-    - image: cimg/go:1.17-node
+    - image: cimg/go:1.21.3-node
       environment:
         SQL_DRIVER: mysql
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true&parseTime=true
@@ -91,7 +91,7 @@ jobs:
         command: go tool cover -func=coverage.out
 
     - setup_remote_docker:
-        version: 20.10.11
+        version: 20.10.24 # https://circleci.com/docs/building-docker-images/#docker-version
 
     - run:
         name: Build docker image
@@ -101,7 +101,7 @@ jobs:
 
   postgres:
     docker:
-    - image: cimg/go:1.17-node
+    - image: cimg/go:1.21.3-node
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
@@ -177,7 +177,7 @@ jobs:
         command: go tool cover -func=coverage.out
 
     - setup_remote_docker:
-        version: 20.10.11
+        version: 20.10.24 # https://circleci.com/docs/building-docker-images/#docker-version
     
     - run:
         name: Build docker image
@@ -188,10 +188,10 @@ jobs:
   build-tags-and-publish-prerelease:
     executor: golang
     environment:
-      KIND_VERSION: 0.11.1
-      KIND_VERSION_NODE: 1.22.0
+      KIND_VERSION: 0.20.0
+      KIND_VERSION_NODE: 1.27.0
       KIND_CLUSTER_NAME: dc1
-      HELM_VERSION: 3.7.2
+      HELM_VERSION: 3.13.1
       IMAGE_NAME: ghcr.io/lord-y/versions/versions
       NAMESPACE: versions
 
