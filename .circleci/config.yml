@@ -132,6 +132,7 @@ jobs:
         name: npm install
         command: |
           cd ui
+          npm install esbuild # to fix ETXTBSY issues https://github.com/vitejs/vite/issues/1361
           npm install
           cd -
 
