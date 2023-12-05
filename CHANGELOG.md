@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.2.0-beta1](https://github.com/Lord-Y/versions/releases/tag/v0.2.0-beta1) - 2023-10-25
+## [v0.2.0-beta1](https://github.com/Lord-Y/versions/releases/tag/v0.2.0-beta1) - 2023-12-05
 
 ### Changed
 - ui:
@@ -12,8 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Update tailwindcss config
   - Improve config management for i18n and linting json translation
   - Typing interfaces import and lint code for *.vue and *.ts files
+  - upgrade to nodejs 20
 - api:
-  - upgrade to golang 1.21.3
+  - upgrade to golang 1.21.4
   - Update db connection management for postgres
   - Update wording for mysql and postgres
   - Add config to prevent health(z) path logging
