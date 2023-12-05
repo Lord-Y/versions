@@ -46,7 +46,10 @@ jobs:
     - run:
         name: npm install
         command: |
+          sudo apt update
+          sudo npm install npm@latest -g
           cd ui
+          npm install esbuild # to fix ETXTBSY issues https://github.com/vitejs/vite/issues/1361
           npm install
           cd -
 
@@ -102,7 +105,7 @@ jobs:
 
   postgres:
     docker:
-    - image: cimg/go:1.21.3-node
+    - image: cimg/go:1.21.4-node
       environment:
         SQL_DRIVER: postgres
         DB_URI: postgres://versions:versions@127.0.0.1:5432/versions?sslmode=disable
@@ -135,7 +138,7 @@ jobs:
           sudo apt update
           sudo npm install npm@latest -g
           cd ui
-          #npm install esbuild # to fix ETXTBSY issues https://github.com/vitejs/vite/issues/1361
+          npm install esbuild # to fix ETXTBSY issues https://github.com/vitejs/vite/issues/1361
           npm install
           cd -
 
