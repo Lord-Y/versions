@@ -95,7 +95,7 @@ jobs:
         command: go tool cover -func=coverage.out
 
     - setup_remote_docker:
-        version: 20.10.24 # https://circleci.com/docs/building-docker-images/#docker-version
+        version: default # https://circleci.com/docs/building-docker-images/#docker-version
 
     - run:
         name: Build docker image
@@ -184,7 +184,7 @@ jobs:
         command: go tool cover -func=coverage.out
 
     - setup_remote_docker:
-        version: 20.10.24 # https://circleci.com/docs/building-docker-images/#docker-version
+        version: default # https://circleci.com/docs/building-docker-images/#docker-version
     
     - run:
         name: Build docker image
