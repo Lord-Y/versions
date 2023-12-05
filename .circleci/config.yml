@@ -259,8 +259,9 @@ jobs:
         name: Publish prerelease
         command: |
           docker push ${IMAGE_NAME}:${CIRCLE_TAG}
-          go get github.com/github-release/github-release
-          git checkout .
+          wget https://github.com/github-release/github-release/releases/download/v0.10.0/linux-amd64-github-release.bz2
+          bzip2 -d linux-amd64-github-release.bz2
+          chmod +x linux-amd64-github-release && sudo mv linux-amd64-github-release /usr/local/bin/github-release
           github-release release -t ${CIRCLE_TAG} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -d "See changelog [here](https://github.com/Lord-Y/versions/blob/main/CHANGELOG.md)" -p
 
   build-tags-and-publish-release:
