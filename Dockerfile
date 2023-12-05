@@ -1,4 +1,4 @@
-ARG DOCKER_IMAGE_NODEJS="node:18-alpine"
+ARG DOCKER_IMAGE_NODEJS="node:20-alpine"
 ARG DOCKER_IMAGE_GOLANG="golang:1.21.4-alpine"
 
 FROM ${DOCKER_IMAGE_NODEJS} as buildernode
