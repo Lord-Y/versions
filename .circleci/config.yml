@@ -4,17 +4,18 @@ version: 2.1
 # https://circleci.com/docs/2.0/configuration-reference/#machine
 # https://github.com/CircleCI-Public/cimg-postgres
 # https://github.com/CircleCI-Public/cimg-mariadb
+# https://circleci.com/developer/images/image/cimg/go
 # 
 
 executors:
   golang:
     machine:
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:current
 
 jobs:
   mariadb:
     docker:
-    - image: cimg/go:1.21.3-node
+    - image: cimg/go:1.21.4-node
       environment:
         SQL_DRIVER: mysql
         DB_URI: versions:versions@tcp(127.0.0.1:3306)/versions?charset=utf8&autocommit=true&multiStatements=true&maxAllowedPacket=0&interpolateParams=true&parseTime=true
